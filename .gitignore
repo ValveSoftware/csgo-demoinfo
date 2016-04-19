@@ -1,0 +1,7 @@
+Debug/
+Release/
+generated_proto/
+demoinfogo.exe
+demoinfogo.opensdf
+protobuf-2.5.0/
+test.dem
