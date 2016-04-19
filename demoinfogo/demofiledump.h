@@ -84,6 +84,8 @@ struct player_info_t
 	CRC32_t			customFiles[ MAX_CUSTOM_FILES ];
 	// this counter increases each time the server downloaded a new file
 	unsigned char	filesDownloaded;
+	// entity index
+	int				entityID;
 };
 
 struct ExcludeEntry
