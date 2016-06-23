@@ -31,7 +31,7 @@ If it has not been reported, create a new issue with at least the following info
 - a link to a demo file causing the issue and where in the demo file the issue occurs;
 - steps for reproducing the issue;
 
-Please place logs either in a code block (press `M` in your browser for a GFM cheat sheet) or a [gist](https://gist.github.com).
+Please place logs either in a code block ([go here](https://guides.github.com/features/mastering-markdown/) for a GFM cheat sheet) or a [gist](https://gist.github.com).
 
 Feature Requests
 ----------------
