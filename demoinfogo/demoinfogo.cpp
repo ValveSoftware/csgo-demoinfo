@@ -53,7 +53,7 @@ int __cdecl main( int argc, char *argv[] )
 				"                Should be after -deaths.\n" \
 				" -stringtables  Dump string tables.\n" \
 				" -datatables    Dump data tables. (send tables)\n" \
-				" -packetentites Dump Packet Entities messages.\n" \
+				" -packetentities Dump Packet Entities messages.\n" \
 				" -netmessages   Dump net messages that are not one of the above.\n" \
 				"Note: by default everything is dumped out.\n" );
 		exit( 0 );
