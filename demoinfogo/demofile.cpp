@@ -151,7 +151,7 @@ bool CDemoFile::Open( const char *name )
 
 		if ( strcmp ( m_DemoHeader.demofilestamp, DEMO_HEADER_ID ) )
 		{
-			fprintf( stderr, "CDemoFile::Open: %s has invalid demo header ID.\n", m_szFileName );
+			fprintf( stderr, "CDemoFile::Open: %s has invalid demo header ID.\n", name );
 			fclose( fp );
 			return false;
 		}
