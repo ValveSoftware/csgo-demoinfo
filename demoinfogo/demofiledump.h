@@ -57,6 +57,9 @@ struct StringTableData_t
 {
 	char	szName[ 64 ];
 	int		nMaxEntries;
+	int		nUserDataSize;      // not currently used to parse stringtable updates, kept for documentation purposes only
+	int		nUserDataSizeBits;  // not currently used to parse stringtable updates, kept for documentation purposes only
+	int		nUserDataFixedSize; // used to parse stringtable updates
 };
 
 // userinfo string table contains these
