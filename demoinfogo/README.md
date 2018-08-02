@@ -8,7 +8,7 @@ Demos and network messages in CS:GO use Google's Protocol Buffers (protobuf). Pr
 Building demoinfogo
 -------------------
 
-### Windows
+### Windows
 
 In order to build demoinfogo on Windows, follow these steps:
 
