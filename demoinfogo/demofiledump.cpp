@@ -428,24 +428,25 @@ void HandlePlayerDeath( const CSVCMsg_GameEvent &msg, const CSVCMsg_GameEventLis
 	{
 		const CSVCMsg_GameEventList::key_t& Key = pDescriptor->keys( i );
 		const CSVCMsg_GameEvent::key_t& KeyValue = msg.keys( i );
+		const auto& Key_name = Key.name();
 
-		if ( Key.name().compare( "userid" ) == 0 )
+		if ( Key_name.compare( "userid" ) == 0 )
 		{
 			userid = KeyValue.val_short();
 		}
-		else if ( Key.name().compare( "attacker" ) == 0 )
+		else if ( Key_name.compare( "attacker" ) == 0 )
 		{
 			attackerid = KeyValue.val_short();
 		}
-		else if ( Key.name().compare( "assister" ) == 0 )
+		else if ( Key_name.compare( "assister" ) == 0 )
 		{
 			assisterid = KeyValue.val_short();
 		}
-		else if ( Key.name().compare( "weapon" ) == 0 )
+		else if ( Key_name.compare( "weapon" ) == 0 )
 		{
 			pWeaponName = KeyValue.val_string().c_str();
 		}
-		else if ( Key.name().compare( "headshot" ) == 0 )
+		else if ( Key_name.compare( "headshot" ) == 0 )
 		{
 			bHeadshot = KeyValue.val_bool();
 		}
