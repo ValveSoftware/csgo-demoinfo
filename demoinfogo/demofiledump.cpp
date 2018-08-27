@@ -275,28 +275,29 @@ bool HandlePlayerConnectDisconnectEvents( const CSVCMsg_GameEvent &msg, const CS
 		{
 			const CSVCMsg_GameEventList::key_t& Key = pDescriptor->keys( i );
 			const CSVCMsg_GameEvent::key_t& KeyValue = msg.keys( i );
+			const auto& Key_name = Key.name();
 
-			if ( Key.name().compare( "userid" ) == 0 )
+			if ( Key_name.compare( "userid" ) == 0 )
 			{
 				userid = KeyValue.val_short();
 			}
-			else if ( Key.name().compare( "index" ) == 0 )
+			else if ( Key_name.compare( "index" ) == 0 )
 			{
 				index = KeyValue.val_byte();
 			}
-			else if ( Key.name().compare( "name" ) == 0 )
+			else if ( Key_name.compare( "name" ) == 0 )
 			{
 				name = KeyValue.val_string().c_str();
 			}
-			else if ( Key.name().compare( "networkid" ) == 0 )
+			else if ( Key_name.compare( "networkid" ) == 0 )
 			{
 				bBot = ( KeyValue.val_string().compare( "BOT" ) == 0 );
 			}
-			else if ( Key.name().compare( "bot" ) == 0 )
+			else if ( Key_name.compare( "bot" ) == 0 )
 			{
 				bBot = KeyValue.val_bool();
 			}
-			else if ( Key.name().compare( "reason" ) == 0 )
+			else if ( Key_name.compare( "reason" ) == 0 )
 			{
 				reason = KeyValue.val_string().c_str();
 			}
