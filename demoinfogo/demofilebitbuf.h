@@ -119,20 +119,29 @@ class CBitRead
 
 	static const uint32 s_nMaskTable[ 33 ];							// 0 1 3 7 15 ..
 
-public:
-	CBitRead( const void *pData, int nBytes, int nBits = -1 )
+	void init( void )
 	{
 		m_bOverflow = false;
 		m_nDataBits = -1;
 		m_nDataBytes = 0;
+
+		m_nInBufWord = 0;
+		m_nBitsAvail = 0;
+		m_pDataIn = nullptr;
+		m_pBufferEnd = nullptr;
+		m_pData = nullptr;
+	}
+
+public:
+	CBitRead( const void *pData, int nBytes, int nBits = -1 )
+	{
+		init();
 		StartReading( pData, nBytes, 0, nBits );
 	}
 	
 	CBitRead( void )
 	{
-		m_bOverflow = false;
-		m_nDataBits = -1;
-		m_nDataBytes = 0;
+		init();
 	}
 
 	void SetOverflowFlag( void )
