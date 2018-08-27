@@ -230,8 +230,12 @@ struct democmdinfo_t
 
 class CDemoFile  
 {
+	void init( void );
+
 public:
 	CDemoFile();
+	CDemoFile( const char *name );
+
 	virtual ~CDemoFile();
 
 	bool	Open( const char *name );
@@ -249,7 +253,6 @@ public:
 
 	demoheader_t *ReadDemoHeader();
 
-public:
 	demoheader_t    m_DemoHeader;  //general demo info
 
 	std::string m_szFileName;

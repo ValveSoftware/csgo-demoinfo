@@ -28,11 +28,24 @@
 
 CDemoFile::CDemoFile()
 {
+	init();
+}
+
+CDemoFile::CDemoFile( const char *name )
+{
+	init();
+	Open(name);
 }
 
 CDemoFile::~CDemoFile()
 {
 	Close();
+}
+
+void CDemoFile::init( void )
+{
+	memset( &m_DemoHeader, 0, sizeof(m_DemoHeader) );
+	m_fileBufferPos = 0;
 }
 
 void CDemoFile::ReadSequenceInfo( int32 &nSeqNrIn, int32 &nSeqNrOut )
