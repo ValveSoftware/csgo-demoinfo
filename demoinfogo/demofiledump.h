@@ -152,14 +152,14 @@ struct EntityEntry
 	}
 	~EntityEntry()
 	{
-		for ( std::vector< PropEntry * >::iterator i = m_props.begin(); i != m_props.end(); i++ )
+		for ( std::vector< PropEntry * >::iterator i = m_props.begin(); i != m_props.end(); ++i )
 		{
 			delete *i;
 		}
 	}
 	PropEntry *FindProp( const char *pName )
 	{
-		for ( std::vector< PropEntry * >::iterator i = m_props.begin(); i != m_props.end(); i++ )
+		for ( std::vector< PropEntry * >::iterator i = m_props.begin(); i != m_props.end(); ++i )
 		{
 			PropEntry *pProp = *i;
 			if (  pProp->m_pFlattenedProp->m_prop->var_name().compare( pName ) == 0 )

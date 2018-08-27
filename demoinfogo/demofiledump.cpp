@@ -210,7 +210,7 @@ void PrintNetMessage< CSVCMsg_UserMessage, svc_UserMessage >( CDemoFileDump& Dem
 
 player_info_t *FindPlayerByEntity( int entityId )
 {
-	for ( std::vector< player_info_t >::iterator j = s_PlayerInfos.begin(); j != s_PlayerInfos.end(); j++ ) 
+	for ( std::vector< player_info_t >::iterator j = s_PlayerInfos.begin(); j != s_PlayerInfos.end(); ++j ) 
 	{
 		if ( j->entityID == entityId ) 
 		{
@@ -223,7 +223,7 @@ player_info_t *FindPlayerByEntity( int entityId )
 
 player_info_t *FindPlayerInfo( int userId )
 {
-	for ( std::vector< player_info_t >::iterator i = s_PlayerInfos.begin(); i != s_PlayerInfos.end(); i++ )
+	for ( std::vector< player_info_t >::iterator i = s_PlayerInfos.begin(); i != s_PlayerInfos.end(); ++i )
 	{
 		if (  i->userID == userId )
 		{
