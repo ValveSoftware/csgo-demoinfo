@@ -710,7 +710,7 @@ void ParseStringTableUpdate( CBitRead &buf, int entries, int nMaxEntries, int us
 		{
 			if ( g_bDumpStringTables )
 			{
-				printf( " %d, %s, %d, %s \n", entryIndex, pEntry, nBytes, pUserData );
+				printf( " %d, %s, %d, %s \n", entryIndex, pEntry, nBytes, ( const char * )(pUserData) );
 			}
 		}
 
