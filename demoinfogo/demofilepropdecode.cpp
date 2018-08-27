@@ -273,7 +273,7 @@ Prop_t *DecodeProp( CBitRead &entityBitBuffer, FlattenedPropEntry *pFlattenedPro
 	const CSVCMsg_SendTable::sendprop_t *pSendProp = pFlattenedProp->m_prop;
 
 	Prop_t *pResult = NULL;
-	if ( pSendProp->type() != DPT_Array && pSendProp->type() != DPT_DataTable )
+	if ( pSendProp->type() != DPT_Array /* && pSendProp->type() != DPT_DataTable */ )
 	{
 		pResult = new Prop_t( ( SendPropType_t )( pSendProp->type() ) );
 	}
@@ -308,9 +308,17 @@ Prop_t *DecodeProp( CBitRead &entityBitBuffer, FlattenedPropEntry *pFlattenedPro
 			pResult->m_value.m_int64 = Int64_Decode( entityBitBuffer, pSendProp );
 			break;
 	}
-	if ( !bQuiet )
+
+	if ( pResult != NULL )
 	{
-		pResult->Print();
+		if (!bQuiet)
+		{
+			pResult->Print();
+		}
+	}
+	else
+	{
+		assert( 0 ); // Should not return null pointer as the result tends to get dereferenced without null check
 	}
 
 	return pResult;
