@@ -495,9 +495,10 @@ void ParseGameEvent( const CSVCMsg_GameEvent &msg, const CSVCMsg_GameEventList::
 					if ( g_bDumpGameEvents )
 					{
 						bool bHandled = false;
-						if ( Key.name().compare( "userid" ) == 0 || Key.name().compare( "attacker" ) == 0 || Key.name().compare( "assister" ) == 0 )
+						const auto& Key_name = Key.name();
+						if ( Key_name.compare( "userid" ) == 0 || Key_name.compare( "attacker" ) == 0 || Key_name.compare( "assister" ) == 0 )
 						{
-							bHandled = ShowPlayerInfo( Key.name().c_str(), KeyValue.val_short(), g_bShowExtraPlayerInfoInGameEvents );
+							bHandled = ShowPlayerInfo( Key_name.c_str(), KeyValue.val_short(), g_bShowExtraPlayerInfoInGameEvents );
 						}
 						if ( !bHandled )
 						{
@@ -1088,7 +1089,7 @@ bool ReadNewEntity( CBitRead &entityBitBuffer, EntityEntry *pEntity )
 
 EntityEntry *FindEntity( int nEntity )
 {
-	for ( std::vector< EntityEntry * >::iterator i = s_Entities.begin(); i != s_Entities.end(); i++ )
+	for ( std::vector< EntityEntry * >::iterator i = s_Entities.begin(); i != s_Entities.end(); ++i )
 	{
 		if (  (*i)->m_nEntity == nEntity )
 		{
@@ -1119,7 +1120,7 @@ EntityEntry *AddEntity( int nEntity, uint32 uClass, uint32 uSerialNum )
 
 void RemoveEntity( int nEntity )
 {
-	for ( std::vector< EntityEntry * >::iterator i = s_Entities.begin(); i != s_Entities.end(); i++ )
+	for ( std::vector< EntityEntry * >::iterator i = s_Entities.begin(); i != s_Entities.end(); ++i )
 	{
 		EntityEntry *pEntity = *i;
 		if (  pEntity->m_nEntity == nEntity )
