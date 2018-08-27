@@ -1073,7 +1073,7 @@ bool ReadNewEntity( CBitRead &entityBitBuffer, EntityEntry *pEntity )
 	CSVCMsg_SendTable *pTable = GetTableByClassID( pEntity->m_uClass );
 	if ( g_bDumpPacketEntities )
 	{
-		printf( "Table: %s\n", pTable->net_table_name().c_str() );
+		printf( "Table: %s\n", ((pTable != nullptr) ? pTable->net_table_name().c_str() : "null") );
 	}
 	for ( unsigned int i = 0; i < fieldIndices.size(); i++ )
 	{
