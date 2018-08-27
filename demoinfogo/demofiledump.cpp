@@ -1547,7 +1547,7 @@ bool DumpStringTable( CBitRead &buf, bool bIsUserInfo )
 
 			buf.ReadBytes( data, userDataSize );
 
-			if( bIsUserInfo && data != NULL )
+			if( bIsUserInfo )
 			{
 				const player_info_t *pUnswappedPlayerInfo = ( const player_info_t * )data;
 				player_info_t playerInfo = *pUnswappedPlayerInfo;
