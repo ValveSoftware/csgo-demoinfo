@@ -142,18 +142,18 @@ struct democmdinfo_t
 			localViewAngles2.Init();
 		}
 
+		Split_t( const Split_t& src )
+		{
+			// Split_t( );
+			Copy( src );
+		}
+
 		Split_t&	operator=( const Split_t& src )
 		{
 			if ( this == &src )
 				return *this;
 
-			flags = src.flags;
-			viewOrigin = src.viewOrigin;
-			viewAngles = src.viewAngles;
-			localViewAngles = src.localViewAngles;
-			viewOrigin2 = src.viewOrigin2;
-			viewAngles2 = src.viewAngles2;
-			localViewAngles2 = src.localViewAngles2;
+			Copy( src );
 
 			return *this;
 		}
@@ -203,6 +203,18 @@ struct democmdinfo_t
 		Vector		viewOrigin2;
 		QAngle		viewAngles2;
 		QAngle		localViewAngles2;
+
+	private:
+		void Copy( const Split_t& src )
+		{
+			flags = src.flags;
+			viewOrigin = src.viewOrigin;
+			viewAngles = src.viewAngles;
+			localViewAngles = src.localViewAngles;
+			viewOrigin2 = src.viewOrigin2;
+			viewAngles2 = src.viewAngles2;
+			localViewAngles2 = src.localViewAngles2;
+		}
 	};
 
 	void Reset( void )
