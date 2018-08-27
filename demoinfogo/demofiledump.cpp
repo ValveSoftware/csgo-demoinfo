@@ -469,17 +469,19 @@ void ParseGameEvent( const CSVCMsg_GameEvent &msg, const CSVCMsg_GameEventList::
 
 	if ( pDescriptor )
 	{
-		if ( !( pDescriptor->name().compare( "player_footstep" ) == 0 && g_bSupressFootstepEvents ) )
+		const auto& pDescriptor_name = pDescriptor->name();
+
+		if ( !( pDescriptor_name.compare( "player_footstep" ) == 0 && g_bSupressFootstepEvents ) )
 		{
 			if ( !HandlePlayerConnectDisconnectEvents( msg, pDescriptor ) )
 			{
-				if ( pDescriptor->name().compare( "round_announce_match_start" ) == 0 )
+				if ( pDescriptor_name.compare( "round_announce_match_start" ) == 0 )
 				{
 					s_bMatchStartOccured = true;
 				}
 
 				bool bAllowDeathReport = !g_bSupressWarmupDeaths || s_bMatchStartOccured;
-				if ( pDescriptor->name().compare( "player_death" ) == 0 && g_bDumpDeaths && bAllowDeathReport )
+				if ( pDescriptor_name.compare( "player_death" ) == 0 && g_bDumpDeaths && bAllowDeathReport )
 				{
 					HandlePlayerDeath( msg, pDescriptor );
 				}
