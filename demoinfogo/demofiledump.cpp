@@ -704,7 +704,7 @@ void ParseStringTableUpdate( CBitRead &buf, int entries, int nMaxEntries, int us
 
 			if ( g_bDumpStringTables )
 			{
-				printf( "player info\n{\n %s:true\n xuid:%lld\n name:%s\n userID:%d\n guid:%s\n friendsID:%d\n friendsName:%s\n fakeplayer:%d\n ishltv:%d\n filesDownloaded:%d\n}\n",
+				printf( "player info\n{\n %s:true\n xuid:%llu\n name:%s\n userID:%d\n guid:%s\n friendsID:%u\n friendsName:%s\n fakeplayer:%d\n ishltv:%d\n filesDownloaded:%d\n}\n",
 					bAdded ? "adding" : "updating", playerInfo.xuid, playerInfo.name, playerInfo.userID, playerInfo.guid, playerInfo.friendsID,
 					playerInfo.friendsName, playerInfo.fakeplayer, playerInfo.ishltv, playerInfo.filesDownloaded );
 			}
@@ -1217,7 +1217,7 @@ void PrintNetMessage< CSVCMsg_PacketEntities, svc_PacketEntities >( CDemoFileDum
 							uint32 uSerialNum = entityBitBuffer.ReadUBitLong( NUM_NETWORKED_EHANDLE_SERIAL_NUMBER_BITS );
 							if ( g_bDumpPacketEntities )
 							{
-								printf( "Entity Enters PVS: id:%d, class:%d, serial:%d\n", nNewEntity, uClass, uSerialNum );
+								printf( "Entity Enters PVS: id:%d, class:%u, serial:%u\n", nNewEntity, uClass, uSerialNum );
 							}
 							EntityEntry *pEntity = AddEntity( nNewEntity, uClass, uSerialNum );
 							if ( !ReadNewEntity( entityBitBuffer, pEntity ) )
@@ -1261,7 +1261,7 @@ void PrintNetMessage< CSVCMsg_PacketEntities, svc_PacketEntities >( CDemoFileDum
 							{
 								if ( g_bDumpPacketEntities )
 								{
-									printf( "Entity Delta update: id:%d, class:%d, serial:%d\n", pEntity->m_nEntity, pEntity->m_uClass, pEntity->m_uSerialNum );
+									printf( "Entity Delta update: id:%d, class:%u, serial:%u\n", pEntity->m_nEntity, pEntity->m_uClass, pEntity->m_uSerialNum );
 								}
 								if ( !ReadNewEntity( entityBitBuffer, pEntity ) )
 								{
@@ -1566,7 +1566,7 @@ bool DumpStringTable( CBitRead &buf, bool bIsUserInfo )
 				{
 					if (g_bDumpStringTables) 
 					{
-						printf("adding:player entity:%d info:\n xuid:%lld\n name:%s\n userID:%d\n guid:%s\n friendsID:%d\n friendsName:%s\n fakeplayer:%d\n ishltv:%d\n filesDownloaded:%d\n",
+						printf("adding:player entity:%d info:\n xuid:%llu\n name:%s\n userID:%d\n guid:%s\n friendsID:%u\n friendsName:%s\n fakeplayer:%d\n ishltv:%d\n filesDownloaded:%d\n",
 							i, playerInfo.xuid, playerInfo.name, playerInfo.userID, playerInfo.guid, playerInfo.friendsID,
 							playerInfo.friendsName, playerInfo.fakeplayer, playerInfo.ishltv, playerInfo.filesDownloaded);
 					}
