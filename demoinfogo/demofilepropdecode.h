@@ -64,16 +64,16 @@ enum SendPropType_t
 
 struct Prop_t
 {
-	Prop_t()
+	Prop_t( void )
 	{
+		init();
 	}
 
 	Prop_t( SendPropType_t type )
 		: m_type( type )
 		, m_nNumElements( 0 )
 	{
-		// this makes all possible types init to 0's
-		m_value.m_vector.Init();
+		init();
 	}
 
 	void Print( int nMaxElements = 0 )
@@ -138,6 +138,16 @@ struct Prop_t
 		Vector m_vector;
 	} m_value;
 	int m_nNumElements;
+
+private:
+	void init( void )
+	{
+		// this makes all possible types init to 0's
+		m_value.m_vector.Init();
+
+		m_type = DPT_Int; // DPT_Int = 0
+		m_nNumElements = 0;
+	}
 };
 
 struct FlattenedPropEntry;
