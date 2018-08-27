@@ -531,7 +531,7 @@ void ParseGameEvent( const CSVCMsg_GameEvent &msg, const CSVCMsg_GameEventList::
 							}
 							if ( KeyValue.has_val_uint64() )
 							{
-								printf( "%lld ", KeyValue.val_uint64() );
+								printf( "%llu ", KeyValue.val_uint64() );
 							}
 							printf( "\n" );
 						}
