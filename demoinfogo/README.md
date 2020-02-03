@@ -10,6 +10,16 @@ Building demoinfogo
 
 ### Windows
 
+#### Visual Studio 2019 (Automated)
+
+Executing the vs19.ps1 PowerShell script will resolve all dependencies, upgrade solution files, and build demoinfogo.exe
+
+```
+PowerShell -NoProfile -ExecutionPolicy Bypass -Command "& './vs19.ps1'"
+```
+
+#### Visual Studio 2010 (Manual)
+
 In order to build demoinfogo on Windows, follow these steps:
 
 1. Download [protobuf-2.5.0.zip](https://github.com/google/protobuf/releases/download/v2.5.0/protobuf-2.5.0.zip) and extract it into the `demoinfogo` folder. This creates the folder `demoinfogo/protobuf-2.5.0`.
