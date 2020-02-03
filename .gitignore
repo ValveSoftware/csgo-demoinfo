@@ -4,4 +4,8 @@ generated_proto/
 demoinfogo.exe
 demoinfogo.opensdf
 protobuf-2.5.0/
+protoc-2.5.0-win32/
+.vs/
 test.dem
+Backup
+UpgradeLog.htm
