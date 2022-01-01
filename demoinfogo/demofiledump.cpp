@@ -96,6 +96,13 @@ void CDemoFileDump::MsgPrintf( const ::google::protobuf::Message& msg, int size,
 
 		// Print the message type and size
 		printf( "---- %s (%d bytes) -----------------\n", TypeName.c_str(), size );
+		printf("yoyoyo");
+
+		if(msg.GetTypeName().compare("CNETMsg_Tick") == 0){
+			int tick = msg.GetReflection()->GetUInt32(msg, msg.GetDescriptor()->field(0));
+			printf("%d \n", tick);
+			printf("hi \n");
+		}
 
 		va_start( vlist, fmt);
 		vprintf( fmt, vlist );
@@ -198,6 +205,7 @@ void PrintNetMessage( CDemoFileDump& Demo, const void *parseBuffer, int BufferSi
 			Demo.m_GameEventList.CopyFrom( msg );
 		}
 
+		printf("hihihihih\n");
 		Demo.MsgPrintf( msg, BufferSize, "%s", msg.DebugString().c_str() );
 	}
 }
@@ -484,6 +492,7 @@ void ParseGameEvent( const CSVCMsg_GameEvent &msg, const CSVCMsg_GameEventList::
 
 				if ( g_bDumpGameEvents )
 				{
+					printf("handling game events\n"); 
 					printf( "%s\n{\n", pDescriptor->name().c_str() );
 				}
 				int numKeys = msg.keys().size();
@@ -1067,6 +1076,7 @@ bool ReadNewEntity( CBitRead &entityBitBuffer, EntityEntry *pEntity )
 	CSVCMsg_SendTable *pTable = GetTableByClassID( pEntity->m_uClass );
 	if ( g_bDumpPacketEntities )
 	{
+		printf("this is where we update entities\n");
 		printf( "Table: %s\n", pTable->net_table_name().c_str() );
 	}
 	for ( unsigned int i = 0; i < fieldIndices.size(); i++ )
