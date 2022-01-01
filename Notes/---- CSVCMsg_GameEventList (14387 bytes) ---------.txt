@@ -1,0 +1,3566 @@
+parsed by ParseGameEvents()
+
+//handles: weapon_fire, player_hurt, bomb_dropped, item_remove, item_equip, player_death, player_footstep, player_jump, smokegrenade_expired, weapon_zoom, weapon_reload,
+//  round_mvp, cs_win_panel_round, round_end, cs_win_panel_match, cs_win_panel_match, cs_round_final_beep, round_freeze_end, hltv_status, endmatch_cmm_start_reveal_items, announce_phase_end, 
+//  player_team, item_pickup, player_spawn, hltv_message, hltv_fixed, round_prestart, round_announce_warmup, round_poststart, player_connect_full, begin_new_match, cs_round_start_beep, round_announce_match_start
+//  other_death, hltv_chase, buytime_ended, bomb_beginplant, bomb_begin_defuse, bomb_planted, cs_pre_restart, round_officially_ended, bomb_pickup, bomb_dropped, bomb_defused, bomb_exploded, endmatch_cmm_start_reveal_items, announce_phase_end
+//  smokegrenade_detonate, flashbang_detonate, hegrenade_detonate, smoke_grenade_expired, molotov_detonate, decoy_detonate, decoy_started, tagrenade_detonate, inferno_startburn, inferno_expire
+//  inferno_extinguish, decoy_firing, player_blind, player_falldamage, 
+
+---- CSVCMsg_GameEventList (14387 bytes) -----------------
+descriptors {
+  eventid: 0
+  name: "server_spawn"
+  keys {
+    type: 1
+    name: "hostname"
+  }
+  keys {
+    type: 1
+    name: "address"
+  }
+  keys {
+    type: 4
+    name: "port"
+  }
+  keys {
+    type: 1
+    name: "game"
+  }
+  keys {
+    type: 1
+    name: "mapname"
+  }
+  keys {
+    type: 3
+    name: "maxplayers"
+  }
+  keys {
+    type: 1
+    name: "os"
+  }
+  keys {
+    type: 6
+    name: "dedicated"
+  }
+  keys {
+    type: 6
+    name: "official"
+  }
+  keys {
+    type: 6
+    name: "password"
+  }
+}
+descriptors {
+  eventid: 1
+  name: "server_pre_shutdown"
+  keys {
+    type: 1
+    name: "reason"
+  }
+}
+descriptors {
+  eventid: 2
+  name: "server_shutdown"
+  keys {
+    type: 1
+    name: "reason"
+  }
+}
+descriptors {
+  eventid: 3
+  name: "server_cvar"
+  keys {
+    type: 1
+    name: "cvarname"
+  }
+  keys {
+    type: 1
+    name: "cvarvalue"
+  }
+}
+descriptors {
+  eventid: 4
+  name: "server_message"
+  keys {
+    type: 1
+    name: "text"
+  }
+}
+descriptors {
+  eventid: 5
+  name: "server_addban"
+  keys {
+    type: 1
+    name: "name"
+  }
+  keys {
+    type: 4
+    name: "userid"
+  }
+  keys {
+    type: 1
+    name: "networkid"
+  }
+  keys {
+    type: 1
+    name: "ip"
+  }
+  keys {
+    type: 1
+    name: "duration"
+  }
+  keys {
+    type: 1
+    name: "by"
+  }
+  keys {
+    type: 6
+    name: "kicked"
+  }
+}
+descriptors {
+  eventid: 6
+  name: "server_removeban"
+  keys {
+    type: 1
+    name: "networkid"
+  }
+  keys {
+    type: 1
+    name: "ip"
+  }
+  keys {
+    type: 1
+    name: "by"
+  }
+}
+descriptors {
+  eventid: 7
+  name: "player_connect"
+  keys {
+    type: 1
+    name: "name"
+  }
+  keys {
+    type: 5
+    name: "index"
+  }
+  keys {
+    type: 4
+    name: "userid"
+  }
+  keys {
+    type: 1
+    name: "networkid"
+  }
+  keys {
+    type: 1
+    name: "address"
+  }
+}
+descriptors {
+  eventid: 8
+  name: "player_info"
+  keys {
+    type: 1
+    name: "name"
+  }
+  keys {
+    type: 5
+    name: "index"
+  }
+  keys {
+    type: 4
+    name: "userid"
+  }
+  keys {
+    type: 1
+    name: "networkid"
+  }
+  keys {
+    type: 6
+    name: "bot"
+  }
+}
+descriptors {
+  eventid: 9
+  name: "player_disconnect"
+  keys {
+    type: 4
+    name: "userid"
+  }
+  keys {
+    type: 1
+    name: "reason"
+  }
+  keys {
+    type: 1
+    name: "name"
+  }
+  keys {
+    type: 1
+    name: "networkid"
+  }
+}
+descriptors {
+  eventid: 10
+  name: "player_activate"
+  keys {
+    type: 4
+    name: "userid"
+  }
+}
+descriptors {
+  eventid: 11
+  name: "player_connect_full"
+  keys {
+    type: 4
+    name: "userid"
+  }
+  keys {
+    type: 5
+    name: "index"
+  }
+}
+descriptors {
+  eventid: 12
+  name: "player_say"
+  keys {
+    type: 4
+    name: "userid"
+  }
+  keys {
+    type: 1
+    name: "text"
+  }
+}
+descriptors {
+  eventid: 13
+  name: "cs_round_start_beep"
+}
+descriptors {
+  eventid: 14
+  name: "cs_round_final_beep"
+}
+descriptors {
+  eventid: 15
+  name: "round_time_warning"
+}
+descriptors {
+  eventid: 16
+  name: "hltv_replay"
+  keys {
+    type: 3
+    name: "delay"
+  }
+}
+descriptors {
+  eventid: 17
+  name: "team_info"
+  keys {
+    type: 5
+    name: "teamid"
+  }
+  keys {
+    type: 1
+    name: "teamname"
+  }
+}
+descriptors {
+  eventid: 18
+  name: "team_score"
+  keys {
+    type: 5
+    name: "teamid"
+  }
+  keys {
+    type: 4
+    name: "score"
+  }
+}
+descriptors {
+  eventid: 19
+  name: "teamplay_broadcast_audio"
+  keys {
+    type: 5
+    name: "team"
+  }
+  keys {
+    type: 1
+    name: "sound"
+  }
+}
+descriptors {
+  eventid: 20
+  name: "gameui_hidden"
+}
+descriptors {
+  eventid: 21
+  name: "items_gifted"
+  keys {
+    type: 5
+    name: "player"
+  }
+  keys {
+    type: 3
+    name: "itemdef"
+  }
+  keys {
+    type: 5
+    name: "numgifts"
+  }
+  keys {
+    type: 5
+    name: "giftidx"
+  }
+  keys {
+    type: 3
+    name: "accountid"
+  }
+}
+descriptors {
+  eventid: 22
+  name: "player_team"
+  keys {
+    type: 4
+    name: "userid"
+  }
+  keys {
+    type: 5
+    name: "team"
+  }
+  keys {
+    type: 5
+    name: "oldteam"
+  }
+  keys {
+    type: 6
+    name: "disconnect"
+  }
+  keys {
+    type: 6
+    name: "autoteam"
+  }
+  keys {
+    type: 6
+    name: "silent"
+  }
+  keys {
+    type: 6
+    name: "isbot"
+  }
+}
+descriptors {
+  eventid: 23
+  name: "player_class"
+  keys {
+    type: 4
+    name: "userid"
+  }
+  keys {
+    type: 1
+    name: "class"
+  }
+}
+descriptors {
+  eventid: 24
+  name: "player_death"
+  keys {
+    type: 4
+    name: "userid"
+  }
+  keys {
+    type: 4
+    name: "attacker"
+  }
+  keys {
+    type: 4
+    name: "assister"
+  }
+  keys {
+    type: 6
+    name: "assistedflash"
+  }
+  keys {
+    type: 1
+    name: "weapon"
+  }
+  keys {
+    type: 1
+    name: "weapon_itemid"
+  }
+  keys {
+    type: 1
+    name: "weapon_fauxitemid"
+  }
+  keys {
+    type: 1
+    name: "weapon_originalowner_xuid"
+  }
+  keys {
+    type: 6
+    name: "headshot"
+  }
+  keys {
+    type: 4
+    name: "dominated"
+  }
+  keys {
+    type: 4
+    name: "revenge"
+  }
+  keys {
+    type: 4
+    name: "wipe"
+  }
+  keys {
+    type: 4
+    name: "penetrated"
+  }
+  keys {
+    type: 6
+    name: "noreplay"
+  }
+  keys {
+    type: 6
+    name: "noscope"
+  }
+  keys {
+    type: 6
+    name: "thrusmoke"
+  }
+  keys {
+    type: 6
+    name: "attackerblind"
+  }
+  keys {
+    type: 2
+    name: "distance"
+  }
+}
+descriptors {
+  eventid: 25
+  name: "player_hurt"
+  keys {
+    type: 4
+    name: "userid"
+  }
+  keys {
+    type: 4
+    name: "attacker"
+  }
+  keys {
+    type: 5
+    name: "health"
+  }
+  keys {
+    type: 5
+    name: "armor"
+  }
+  keys {
+    type: 1
+    name: "weapon"
+  }
+  keys {
+    type: 4
+    name: "dmg_health"
+  }
+  keys {
+    type: 5
+    name: "dmg_armor"
+  }
+  keys {
+    type: 5
+    name: "hitgroup"
+  }
+}
+descriptors {
+  eventid: 26
+  name: "player_chat"
+  keys {
+    type: 6
+    name: "teamonly"
+  }
+  keys {
+    type: 4
+    name: "userid"
+  }
+  keys {
+    type: 1
+    name: "text"
+  }
+}
+descriptors {
+  eventid: 27
+  name: "player_score"
+  keys {
+    type: 4
+    name: "userid"
+  }
+  keys {
+    type: 4
+    name: "kills"
+  }
+  keys {
+    type: 4
+    name: "deaths"
+  }
+  keys {
+    type: 4
+    name: "score"
+  }
+}
+descriptors {
+  eventid: 28
+  name: "player_spawn"
+  keys {
+    type: 4
+    name: "userid"
+  }
+  keys {
+    type: 4
+    name: "teamnum"
+  }
+}
+descriptors {
+  eventid: 29
+  name: "player_shoot"
+  keys {
+    type: 4
+    name: "userid"
+  }
+  keys {
+    type: 5
+    name: "weapon"
+  }
+  keys {
+    type: 5
+    name: "mode"
+  }
+}
+descriptors {
+  eventid: 30
+  name: "player_use"
+  keys {
+    type: 4
+    name: "userid"
+  }
+  keys {
+    type: 4
+    name: "entity"
+  }
+}
+descriptors {
+  eventid: 31
+  name: "player_changename"
+  keys {
+    type: 4
+    name: "userid"
+  }
+  keys {
+    type: 1
+    name: "oldname"
+  }
+  keys {
+    type: 1
+    name: "newname"
+  }
+}
+descriptors {
+  eventid: 32
+  name: "player_hintmessage"
+  keys {
+    type: 1
+    name: "hintmessage"
+  }
+}
+descriptors {
+  eventid: 33
+  name: "game_init"
+}
+descriptors {
+  eventid: 34
+  name: "game_newmap"
+  keys {
+    type: 1
+    name: "mapname"
+  }
+}
+descriptors {
+  eventid: 35
+  name: "game_start"
+  keys {
+    type: 3
+    name: "roundslimit"
+  }
+  keys {
+    type: 3
+    name: "timelimit"
+  }
+  keys {
+    type: 3
+    name: "fraglimit"
+  }
+  keys {
+    type: 1
+    name: "objective"
+  }
+}
+descriptors {
+  eventid: 36
+  name: "game_end"
+  keys {
+    type: 5
+    name: "winner"
+  }
+}
+descriptors {
+  eventid: 37
+  name: "round_start"
+  keys {
+    type: 3
+    name: "timelimit"
+  }
+  keys {
+    type: 3
+    name: "fraglimit"
+  }
+  keys {
+    type: 1
+    name: "objective"
+  }
+}
+descriptors {
+  eventid: 38
+  name: "round_announce_match_point"
+}
+descriptors {
+  eventid: 39
+  name: "round_announce_final"
+}
+descriptors {
+  eventid: 40
+  name: "round_announce_last_round_half"
+}
+descriptors {
+  eventid: 41
+  name: "round_announce_match_start"
+}
+descriptors {
+  eventid: 42
+  name: "round_announce_warmup"
+}
+descriptors {
+  eventid: 43
+  name: "round_end"
+  keys {
+    type: 5
+    name: "winner"
+  }
+  keys {
+    type: 5
+    name: "reason"
+  }
+  keys {
+    type: 1
+    name: "message"
+  }
+  keys {
+    type: 5
+    name: "legacy"
+  }
+  keys {
+    type: 4
+    name: "player_count"
+  }
+  keys {
+    type: 5
+    name: "nomusic"
+  }
+}
+descriptors {
+  eventid: 44
+  name: "round_end_upload_stats"
+}
+descriptors {
+  eventid: 45
+  name: "round_officially_ended"
+}
+descriptors {
+  eventid: 46
+  name: "ugc_map_info_received"
+  keys {
+    type: 7
+    name: "published_file_id"
+  }
+}
+descriptors {
+  eventid: 47
+  name: "ugc_map_unsubscribed"
+  keys {
+    type: 7
+    name: "published_file_id"
+  }
+}
+descriptors {
+  eventid: 48
+  name: "ugc_map_download_error"
+  keys {
+    type: 7
+    name: "published_file_id"
+  }
+  keys {
+    type: 3
+    name: "error_code"
+  }
+}
+descriptors {
+  eventid: 49
+  name: "ugc_file_download_finished"
+  keys {
+    type: 7
+    name: "hcontent"
+  }
+}
+descriptors {
+  eventid: 50
+  name: "ugc_file_download_start"
+  keys {
+    type: 7
+    name: "hcontent"
+  }
+  keys {
+    type: 7
+    name: "published_file_id"
+  }
+}
+descriptors {
+  eventid: 51
+  name: "begin_new_match"
+}
+descriptors {
+  eventid: 52
+  name: "round_start_pre_entity"
+}
+descriptors {
+  eventid: 53
+  name: "teamplay_round_start"
+  keys {
+    type: 6
+    name: "full_reset"
+  }
+}
+descriptors {
+  eventid: 54
+  name: "hostname_changed"
+  keys {
+    type: 1
+    name: "hostname"
+  }
+}
+descriptors {
+  eventid: 55
+  name: "difficulty_changed"
+  keys {
+    type: 4
+    name: "newDifficulty"
+  }
+  keys {
+    type: 4
+    name: "oldDifficulty"
+  }
+  keys {
+    type: 1
+    name: "strDifficulty"
+  }
+}
+descriptors {
+  eventid: 56
+  name: "finale_start"
+  keys {
+    type: 4
+    name: "rushes"
+  }
+}
+descriptors {
+  eventid: 57
+  name: "game_message"
+  keys {
+    type: 5
+    name: "target"
+  }
+  keys {
+    type: 1
+    name: "text"
+  }
+}
+descriptors {
+  eventid: 58
+  name: "dm_bonus_weapon_start"
+  keys {
+    type: 4
+    name: "time"
+  }
+  keys {
+    type: 4
+    name: "Pos"
+  }
+}
+descriptors {
+  eventid: 59
+  name: "survival_announce_phase"
+  keys {
+    type: 4
+    name: "phase"
+  }
+}
+descriptors {
+  eventid: 60
+  name: "break_breakable"
+  keys {
+    type: 3
+    name: "entindex"
+  }
+  keys {
+    type: 4
+    name: "userid"
+  }
+  keys {
+    type: 5
+    name: "material"
+  }
+}
+descriptors {
+  eventid: 61
+  name: "break_prop"
+  keys {
+    type: 3
+    name: "entindex"
+  }
+  keys {
+    type: 4
+    name: "userid"
+  }
+}
+descriptors {
+  eventid: 62
+  name: "player_decal"
+  keys {
+    type: 4
+    name: "userid"
+  }
+}
+descriptors {
+  eventid: 63
+  name: "entity_killed"
+  keys {
+    type: 3
+    name: "entindex_killed"
+  }
+  keys {
+    type: 3
+    name: "entindex_attacker"
+  }
+  keys {
+    type: 3
+    name: "entindex_inflictor"
+  }
+  keys {
+    type: 3
+    name: "damagebits"
+  }
+}
+descriptors {
+  eventid: 64
+  name: "bonus_updated"
+  keys {
+    type: 4
+    name: "numadvanced"
+  }
+  keys {
+    type: 4
+    name: "numbronze"
+  }
+  keys {
+    type: 4
+    name: "numsilver"
+  }
+  keys {
+    type: 4
+    name: "numgold"
+  }
+}
+descriptors {
+  eventid: 65
+  name: "player_stats_updated"
+  keys {
+    type: 6
+    name: "forceupload"
+  }
+}
+descriptors {
+  eventid: 66
+  name: "achievement_event"
+  keys {
+    type: 1
+    name: "achievement_name"
+  }
+  keys {
+    type: 4
+    name: "cur_val"
+  }
+  keys {
+    type: 4
+    name: "max_val"
+  }
+}
+descriptors {
+  eventid: 67
+  name: "achievement_increment"
+  keys {
+    type: 3
+    name: "achievement_id"
+  }
+  keys {
+    type: 4
+    name: "cur_val"
+  }
+  keys {
+    type: 4
+    name: "max_val"
+  }
+}
+descriptors {
+  eventid: 68
+  name: "achievement_earned"
+  keys {
+    type: 5
+    name: "player"
+  }
+  keys {
+    type: 4
+    name: "achievement"
+  }
+}
+descriptors {
+  eventid: 69
+  name: "achievement_write_failed"
+}
+descriptors {
+  eventid: 70
+  name: "physgun_pickup"
+  keys {
+    type: 3
+    name: "entindex"
+  }
+}
+descriptors {
+  eventid: 71
+  name: "flare_ignite_npc"
+  keys {
+    type: 3
+    name: "entindex"
+  }
+}
+descriptors {
+  eventid: 72
+  name: "helicopter_grenade_punt_miss"
+}
+descriptors {
+  eventid: 73
+  name: "user_data_downloaded"
+}
+descriptors {
+  eventid: 74
+  name: "ragdoll_dissolved"
+  keys {
+    type: 3
+    name: "entindex"
+  }
+}
+descriptors {
+  eventid: 75
+  name: "gameinstructor_draw"
+}
+descriptors {
+  eventid: 76
+  name: "gameinstructor_nodraw"
+}
+descriptors {
+  eventid: 77
+  name: "map_transition"
+}
+descriptors {
+  eventid: 78
+  name: "entity_visible"
+  keys {
+    type: 4
+    name: "userid"
+  }
+  keys {
+    type: 4
+    name: "subject"
+  }
+  keys {
+    type: 1
+    name: "classname"
+  }
+  keys {
+    type: 1
+    name: "entityname"
+  }
+}
+descriptors {
+  eventid: 79
+  name: "set_instructor_group_enabled"
+  keys {
+    type: 1
+    name: "group"
+  }
+  keys {
+    type: 4
+    name: "enabled"
+  }
+}
+descriptors {
+  eventid: 80
+  name: "instructor_server_hint_create"
+  keys {
+    type: 1
+    name: "hint_name"
+  }
+  keys {
+    type: 1
+    name: "hint_replace_key"
+  }
+  keys {
+    type: 3
+    name: "hint_target"
+  }
+  keys {
+    type: 4
+    name: "hint_activator_userid"
+  }
+  keys {
+    type: 4
+    name: "hint_timeout"
+  }
+  keys {
+    type: 1
+    name: "hint_icon_onscreen"
+  }
+  keys {
+    type: 1
+    name: "hint_icon_offscreen"
+  }
+  keys {
+    type: 1
+    name: "hint_caption"
+  }
+  keys {
+    type: 1
+    name: "hint_activator_caption"
+  }
+  keys {
+    type: 1
+    name: "hint_color"
+  }
+  keys {
+    type: 2
+    name: "hint_icon_offset"
+  }
+  keys {
+    type: 2
+    name: "hint_range"
+  }
+  keys {
+    type: 3
+    name: "hint_flags"
+  }
+  keys {
+    type: 1
+    name: "hint_binding"
+  }
+  keys {
+    type: 1
+    name: "hint_gamepad_binding"
+  }
+  keys {
+    type: 6
+    name: "hint_allow_nodraw_target"
+  }
+  keys {
+    type: 6
+    name: "hint_nooffscreen"
+  }
+  keys {
+    type: 6
+    name: "hint_forcecaption"
+  }
+  keys {
+    type: 6
+    name: "hint_local_player_only"
+  }
+}
+descriptors {
+  eventid: 81
+  name: "instructor_server_hint_stop"
+  keys {
+    type: 1
+    name: "hint_name"
+  }
+}
+descriptors {
+  eventid: 82
+  name: "read_game_titledata"
+  keys {
+    type: 4
+    name: "controllerId"
+  }
+}
+descriptors {
+  eventid: 83
+  name: "write_game_titledata"
+  keys {
+    type: 4
+    name: "controllerId"
+  }
+}
+descriptors {
+  eventid: 84
+  name: "reset_game_titledata"
+  keys {
+    type: 4
+    name: "controllerId"
+  }
+}
+descriptors {
+  eventid: 85
+  name: "weaponhud_selection"
+  keys {
+    type: 4
+    name: "userid"
+  }
+  keys {
+    type: 5
+    name: "mode"
+  }
+  keys {
+    type: 3
+    name: "entindex"
+  }
+}
+descriptors {
+  eventid: 86
+  name: "vote_ended"
+}
+descriptors {
+  eventid: 87
+  name: "vote_started"
+  keys {
+    type: 1
+    name: "issue"
+  }
+  keys {
+    type: 1
+    name: "param1"
+  }
+  keys {
+    type: 5
+    name: "team"
+  }
+  keys {
+    type: 3
+    name: "initiator"
+  }
+}
+descriptors {
+  eventid: 88
+  name: "vote_changed"
+  keys {
+    type: 5
+    name: "vote_option1"
+  }
+  keys {
+    type: 5
+    name: "vote_option2"
+  }
+  keys {
+    type: 5
+    name: "vote_option3"
+  }
+  keys {
+    type: 5
+    name: "vote_option4"
+  }
+  keys {
+    type: 5
+    name: "vote_option5"
+  }
+  keys {
+    type: 5
+    name: "potentialVotes"
+  }
+}
+descriptors {
+  eventid: 89
+  name: "vote_passed"
+  keys {
+    type: 1
+    name: "details"
+  }
+  keys {
+    type: 1
+    name: "param1"
+  }
+  keys {
+    type: 5
+    name: "team"
+  }
+}
+descriptors {
+  eventid: 90
+  name: "vote_failed"
+  keys {
+    type: 5
+    name: "team"
+  }
+}
+descriptors {
+  eventid: 91
+  name: "vote_cast"
+  keys {
+    type: 5
+    name: "vote_option"
+  }
+  keys {
+    type: 4
+    name: "team"
+  }
+  keys {
+    type: 3
+    name: "entityid"
+  }
+}
+descriptors {
+  eventid: 92
+  name: "vote_options"
+  keys {
+    type: 5
+    name: "count"
+  }
+  keys {
+    type: 1
+    name: "option1"
+  }
+  keys {
+    type: 1
+    name: "option2"
+  }
+  keys {
+    type: 1
+    name: "option3"
+  }
+  keys {
+    type: 1
+    name: "option4"
+  }
+  keys {
+    type: 1
+    name: "option5"
+  }
+}
+descriptors {
+  eventid: 93
+  name: "endmatch_mapvote_selecting_map"
+  keys {
+    type: 5
+    name: "count"
+  }
+  keys {
+    type: 5
+    name: "slot1"
+  }
+  keys {
+    type: 5
+    name: "slot2"
+  }
+  keys {
+    type: 5
+    name: "slot3"
+  }
+  keys {
+    type: 5
+    name: "slot4"
+  }
+  keys {
+    type: 5
+    name: "slot5"
+  }
+  keys {
+    type: 5
+    name: "slot6"
+  }
+  keys {
+    type: 5
+    name: "slot7"
+  }
+  keys {
+    type: 5
+    name: "slot8"
+  }
+  keys {
+    type: 5
+    name: "slot9"
+  }
+  keys {
+    type: 5
+    name: "slot10"
+  }
+}
+descriptors {
+  eventid: 94
+  name: "endmatch_cmm_start_reveal_items"
+}
+descriptors {
+  eventid: 95
+  name: "inventory_updated"
+}
+descriptors {
+  eventid: 96
+  name: "cart_updated"
+}
+descriptors {
+  eventid: 97
+  name: "store_pricesheet_updated"
+}
+descriptors {
+  eventid: 98
+  name: "gc_connected"
+}
+descriptors {
+  eventid: 99
+  name: "item_schema_initialized"
+}
+descriptors {
+  eventid: 100
+  name: "client_loadout_changed"
+}
+descriptors {
+  eventid: 101
+  name: "add_player_sonar_icon"
+  keys {
+    type: 4
+    name: "userid"
+  }
+  keys {
+    type: 2
+    name: "pos_x"
+  }
+  keys {
+    type: 2
+    name: "pos_y"
+  }
+  keys {
+    type: 2
+    name: "pos_z"
+  }
+}
+descriptors {
+  eventid: 102
+  name: "add_bullet_hit_marker"
+  keys {
+    type: 4
+    name: "userid"
+  }
+  keys {
+    type: 4
+    name: "bone"
+  }
+  keys {
+    type: 4
+    name: "pos_x"
+  }
+  keys {
+    type: 4
+    name: "pos_y"
+  }
+  keys {
+    type: 4
+    name: "pos_z"
+  }
+  keys {
+    type: 4
+    name: "ang_x"
+  }
+  keys {
+    type: 4
+    name: "ang_y"
+  }
+  keys {
+    type: 4
+    name: "ang_z"
+  }
+  keys {
+    type: 4
+    name: "start_x"
+  }
+  keys {
+    type: 4
+    name: "start_y"
+  }
+  keys {
+    type: 4
+    name: "start_z"
+  }
+  keys {
+    type: 6
+    name: "hit"
+  }
+}
+descriptors {
+  eventid: 103
+  name: "verify_client_hit"
+  keys {
+    type: 4
+    name: "userid"
+  }
+  keys {
+    type: 2
+    name: "pos_x"
+  }
+  keys {
+    type: 2
+    name: "pos_y"
+  }
+  keys {
+    type: 2
+    name: "pos_z"
+  }
+  keys {
+    type: 2
+    name: "timestamp"
+  }
+}
+descriptors {
+  eventid: 104
+  name: "other_death"
+  keys {
+    type: 4
+    name: "otherid"
+  }
+  keys {
+    type: 1
+    name: "othertype"
+  }
+  keys {
+    type: 4
+    name: "attacker"
+  }
+  keys {
+    type: 1
+    name: "weapon"
+  }
+  keys {
+    type: 1
+    name: "weapon_itemid"
+  }
+  keys {
+    type: 1
+    name: "weapon_fauxitemid"
+  }
+  keys {
+    type: 1
+    name: "weapon_originalowner_xuid"
+  }
+  keys {
+    type: 6
+    name: "headshot"
+  }
+  keys {
+    type: 4
+    name: "penetrated"
+  }
+  keys {
+    type: 6
+    name: "noscope"
+  }
+  keys {
+    type: 6
+    name: "thrusmoke"
+  }
+  keys {
+    type: 6
+    name: "attackerblind"
+  }
+}
+descriptors {
+  eventid: 105
+  name: "item_purchase"
+  keys {
+    type: 4
+    name: "userid"
+  }
+  keys {
+    type: 4
+    name: "team"
+  }
+  keys {
+    type: 4
+    name: "loadout"
+  }
+  keys {
+    type: 1
+    name: "weapon"
+  }
+}
+descriptors {
+  eventid: 106
+  name: "bomb_beginplant"
+  keys {
+    type: 4
+    name: "userid"
+  }
+  keys {
+    type: 3
+    name: "site"
+  }
+}
+descriptors {
+  eventid: 107
+  name: "bomb_abortplant"
+  keys {
+    type: 4
+    name: "userid"
+  }
+  keys {
+    type: 3
+    name: "site"
+  }
+}
+descriptors {
+  eventid: 108
+  name: "bomb_planted"
+  keys {
+    type: 4
+    name: "userid"
+  }
+  keys {
+    type: 3
+    name: "site"
+  }
+}
+descriptors {
+  eventid: 109
+  name: "bomb_defused"
+  keys {
+    type: 4
+    name: "userid"
+  }
+  keys {
+    type: 3
+    name: "site"
+  }
+}
+descriptors {
+  eventid: 110
+  name: "bomb_exploded"
+  keys {
+    type: 4
+    name: "userid"
+  }
+  keys {
+    type: 3
+    name: "site"
+  }
+}
+descriptors {
+  eventid: 111
+  name: "bomb_dropped"
+  keys {
+    type: 4
+    name: "userid"
+  }
+  keys {
+    type: 3
+    name: "entindex"
+  }
+}
+descriptors {
+  eventid: 112
+  name: "bomb_pickup"
+  keys {
+    type: 4
+    name: "userid"
+  }
+}
+descriptors {
+  eventid: 113
+  name: "defuser_dropped"
+  keys {
+    type: 3
+    name: "entityid"
+  }
+}
+descriptors {
+  eventid: 114
+  name: "defuser_pickup"
+  keys {
+    type: 3
+    name: "entityid"
+  }
+  keys {
+    type: 4
+    name: "userid"
+  }
+}
+descriptors {
+  eventid: 115
+  name: "announce_phase_end"
+}
+descriptors {
+  eventid: 116
+  name: "cs_intermission"
+}
+descriptors {
+  eventid: 117
+  name: "bomb_begindefuse"
+  keys {
+    type: 4
+    name: "userid"
+  }
+  keys {
+    type: 6
+    name: "haskit"
+  }
+}
+descriptors {
+  eventid: 118
+  name: "bomb_abortdefuse"
+  keys {
+    type: 4
+    name: "userid"
+  }
+}
+descriptors {
+  eventid: 119
+  name: "hostage_follows"
+  keys {
+    type: 4
+    name: "userid"
+  }
+  keys {
+    type: 4
+    name: "hostage"
+  }
+}
+descriptors {
+  eventid: 120
+  name: "hostage_hurt"
+  keys {
+    type: 4
+    name: "userid"
+  }
+  keys {
+    type: 4
+    name: "hostage"
+  }
+}
+descriptors {
+  eventid: 121
+  name: "hostage_killed"
+  keys {
+    type: 4
+    name: "userid"
+  }
+  keys {
+    type: 4
+    name: "hostage"
+  }
+}
+descriptors {
+  eventid: 122
+  name: "hostage_rescued"
+  keys {
+    type: 4
+    name: "userid"
+  }
+  keys {
+    type: 4
+    name: "hostage"
+  }
+  keys {
+    type: 4
+    name: "site"
+  }
+}
+descriptors {
+  eventid: 123
+  name: "hostage_stops_following"
+  keys {
+    type: 4
+    name: "userid"
+  }
+  keys {
+    type: 4
+    name: "hostage"
+  }
+}
+descriptors {
+  eventid: 124
+  name: "hostage_rescued_all"
+}
+descriptors {
+  eventid: 125
+  name: "hostage_call_for_help"
+  keys {
+    type: 4
+    name: "hostage"
+  }
+}
+descriptors {
+  eventid: 126
+  name: "vip_escaped"
+  keys {
+    type: 4
+    name: "userid"
+  }
+}
+descriptors {
+  eventid: 127
+  name: "vip_killed"
+  keys {
+    type: 4
+    name: "userid"
+  }
+  keys {
+    type: 4
+    name: "attacker"
+  }
+}
+descriptors {
+  eventid: 128
+  name: "player_radio"
+  keys {
+    type: 4
+    name: "userid"
+  }
+  keys {
+    type: 4
+    name: "slot"
+  }
+}
+descriptors {
+  eventid: 129
+  name: "bomb_beep"
+  keys {
+    type: 3
+    name: "entindex"
+  }
+}
+descriptors {
+  eventid: 130
+  name: "weapon_fire"
+  keys {
+    type: 4
+    name: "userid"
+  }
+  keys {
+    type: 1
+    name: "weapon"
+  }
+  keys {
+    type: 6
+    name: "silenced"
+  }
+}
+descriptors {
+  eventid: 131
+  name: "weapon_fire_on_empty"
+  keys {
+    type: 4
+    name: "userid"
+  }
+  keys {
+    type: 1
+    name: "weapon"
+  }
+}
+descriptors {
+  eventid: 132
+  name: "grenade_thrown"
+  keys {
+    type: 4
+    name: "userid"
+  }
+  keys {
+    type: 1
+    name: "weapon"
+  }
+}
+descriptors {
+  eventid: 133
+  name: "weapon_outofammo"
+  keys {
+    type: 4
+    name: "userid"
+  }
+}
+descriptors {
+  eventid: 134
+  name: "weapon_reload"
+  keys {
+    type: 4
+    name: "userid"
+  }
+}
+descriptors {
+  eventid: 135
+  name: "weapon_zoom"
+  keys {
+    type: 4
+    name: "userid"
+  }
+}
+descriptors {
+  eventid: 136
+  name: "silencer_detach"
+  keys {
+    type: 4
+    name: "userid"
+  }
+}
+descriptors {
+  eventid: 137
+  name: "inspect_weapon"
+  keys {
+    type: 4
+    name: "userid"
+  }
+}
+descriptors {
+  eventid: 138
+  name: "weapon_zoom_rifle"
+  keys {
+    type: 4
+    name: "userid"
+  }
+}
+descriptors {
+  eventid: 139
+  name: "player_spawned"
+  keys {
+    type: 4
+    name: "userid"
+  }
+  keys {
+    type: 6
+    name: "inrestart"
+  }
+}
+descriptors {
+  eventid: 140
+  name: "item_pickup"
+  keys {
+    type: 4
+    name: "userid"
+  }
+  keys {
+    type: 1
+    name: "item"
+  }
+  keys {
+    type: 6
+    name: "silent"
+  }
+  keys {
+    type: 3
+    name: "defindex"
+  }
+}
+descriptors {
+  eventid: 141
+  name: "item_pickup_slerp"
+  keys {
+    type: 4
+    name: "userid"
+  }
+  keys {
+    type: 4
+    name: "index"
+  }
+  keys {
+    type: 4
+    name: "behavior"
+  }
+}
+descriptors {
+  eventid: 142
+  name: "item_pickup_failed"
+  keys {
+    type: 4
+    name: "userid"
+  }
+  keys {
+    type: 1
+    name: "item"
+  }
+  keys {
+    type: 4
+    name: "reason"
+  }
+  keys {
+    type: 4
+    name: "limit"
+  }
+}
+descriptors {
+  eventid: 143
+  name: "item_remove"
+  keys {
+    type: 4
+    name: "userid"
+  }
+  keys {
+    type: 1
+    name: "item"
+  }
+  keys {
+    type: 3
+    name: "defindex"
+  }
+}
+descriptors {
+  eventid: 144
+  name: "ammo_pickup"
+  keys {
+    type: 4
+    name: "userid"
+  }
+  keys {
+    type: 1
+    name: "item"
+  }
+  keys {
+    type: 3
+    name: "index"
+  }
+}
+descriptors {
+  eventid: 145
+  name: "item_equip"
+  keys {
+    type: 4
+    name: "userid"
+  }
+  keys {
+    type: 1
+    name: "item"
+  }
+  keys {
+    type: 3
+    name: "defindex"
+  }
+  keys {
+    type: 6
+    name: "canzoom"
+  }
+  keys {
+    type: 6
+    name: "hassilencer"
+  }
+  keys {
+    type: 6
+    name: "issilenced"
+  }
+  keys {
+    type: 6
+    name: "hastracers"
+  }
+  keys {
+    type: 4
+    name: "weptype"
+  }
+  keys {
+    type: 6
+    name: "ispainted"
+  }
+}
+descriptors {
+  eventid: 146
+  name: "enter_buyzone"
+  keys {
+    type: 4
+    name: "userid"
+  }
+  keys {
+    type: 6
+    name: "canbuy"
+  }
+}
+descriptors {
+  eventid: 147
+  name: "exit_buyzone"
+  keys {
+    type: 4
+    name: "userid"
+  }
+  keys {
+    type: 6
+    name: "canbuy"
+  }
+}
+descriptors {
+  eventid: 148
+  name: "buytime_ended"
+}
+descriptors {
+  eventid: 149
+  name: "enter_bombzone"
+  keys {
+    type: 4
+    name: "userid"
+  }
+  keys {
+    type: 6
+    name: "hasbomb"
+  }
+  keys {
+    type: 6
+    name: "isplanted"
+  }
+}
+descriptors {
+  eventid: 150
+  name: "exit_bombzone"
+  keys {
+    type: 4
+    name: "userid"
+  }
+  keys {
+    type: 6
+    name: "hasbomb"
+  }
+  keys {
+    type: 6
+    name: "isplanted"
+  }
+}
+descriptors {
+  eventid: 151
+  name: "enter_rescue_zone"
+  keys {
+    type: 4
+    name: "userid"
+  }
+}
+descriptors {
+  eventid: 152
+  name: "exit_rescue_zone"
+  keys {
+    type: 4
+    name: "userid"
+  }
+}
+descriptors {
+  eventid: 153
+  name: "silencer_off"
+  keys {
+    type: 4
+    name: "userid"
+  }
+}
+descriptors {
+  eventid: 154
+  name: "silencer_on"
+  keys {
+    type: 4
+    name: "userid"
+  }
+}
+descriptors {
+  eventid: 155
+  name: "buymenu_open"
+  keys {
+    type: 4
+    name: "userid"
+  }
+}
+descriptors {
+  eventid: 156
+  name: "buymenu_close"
+  keys {
+    type: 4
+    name: "userid"
+  }
+}
+descriptors {
+  eventid: 157
+  name: "round_prestart"
+}
+descriptors {
+  eventid: 158
+  name: "round_poststart"
+}
+descriptors {
+  eventid: 159
+  name: "grenade_bounce"
+  keys {
+    type: 4
+    name: "userid"
+  }
+}
+descriptors {
+  eventid: 160
+  name: "hegrenade_detonate"
+  keys {
+    type: 4
+    name: "userid"
+  }
+  keys {
+    type: 4
+    name: "entityid"
+  }
+  keys {
+    type: 2
+    name: "x"
+  }
+  keys {
+    type: 2
+    name: "y"
+  }
+  keys {
+    type: 2
+    name: "z"
+  }
+}
+descriptors {
+  eventid: 161
+  name: "flashbang_detonate"
+  keys {
+    type: 4
+    name: "userid"
+  }
+  keys {
+    type: 4
+    name: "entityid"
+  }
+  keys {
+    type: 2
+    name: "x"
+  }
+  keys {
+    type: 2
+    name: "y"
+  }
+  keys {
+    type: 2
+    name: "z"
+  }
+}
+descriptors {
+  eventid: 162
+  name: "smokegrenade_detonate"
+  keys {
+    type: 4
+    name: "userid"
+  }
+  keys {
+    type: 4
+    name: "entityid"
+  }
+  keys {
+    type: 2
+    name: "x"
+  }
+  keys {
+    type: 2
+    name: "y"
+  }
+  keys {
+    type: 2
+    name: "z"
+  }
+}
+descriptors {
+  eventid: 163
+  name: "smokegrenade_expired"
+  keys {
+    type: 4
+    name: "userid"
+  }
+  keys {
+    type: 4
+    name: "entityid"
+  }
+  keys {
+    type: 2
+    name: "x"
+  }
+  keys {
+    type: 2
+    name: "y"
+  }
+  keys {
+    type: 2
+    name: "z"
+  }
+}
+descriptors {
+  eventid: 164
+  name: "molotov_detonate"
+  keys {
+    type: 4
+    name: "userid"
+  }
+  keys {
+    type: 2
+    name: "x"
+  }
+  keys {
+    type: 2
+    name: "y"
+  }
+  keys {
+    type: 2
+    name: "z"
+  }
+}
+descriptors {
+  eventid: 165
+  name: "decoy_detonate"
+  keys {
+    type: 4
+    name: "userid"
+  }
+  keys {
+    type: 4
+    name: "entityid"
+  }
+  keys {
+    type: 2
+    name: "x"
+  }
+  keys {
+    type: 2
+    name: "y"
+  }
+  keys {
+    type: 2
+    name: "z"
+  }
+}
+descriptors {
+  eventid: 166
+  name: "decoy_started"
+  keys {
+    type: 4
+    name: "userid"
+  }
+  keys {
+    type: 4
+    name: "entityid"
+  }
+  keys {
+    type: 2
+    name: "x"
+  }
+  keys {
+    type: 2
+    name: "y"
+  }
+  keys {
+    type: 2
+    name: "z"
+  }
+}
+descriptors {
+  eventid: 167
+  name: "tagrenade_detonate"
+  keys {
+    type: 4
+    name: "userid"
+  }
+  keys {
+    type: 4
+    name: "entityid"
+  }
+  keys {
+    type: 2
+    name: "x"
+  }
+  keys {
+    type: 2
+    name: "y"
+  }
+  keys {
+    type: 2
+    name: "z"
+  }
+}
+descriptors {
+  eventid: 168
+  name: "inferno_startburn"
+  keys {
+    type: 4
+    name: "entityid"
+  }
+  keys {
+    type: 2
+    name: "x"
+  }
+  keys {
+    type: 2
+    name: "y"
+  }
+  keys {
+    type: 2
+    name: "z"
+  }
+}
+descriptors {
+  eventid: 169
+  name: "inferno_expire"
+  keys {
+    type: 4
+    name: "entityid"
+  }
+  keys {
+    type: 2
+    name: "x"
+  }
+  keys {
+    type: 2
+    name: "y"
+  }
+  keys {
+    type: 2
+    name: "z"
+  }
+}
+descriptors {
+  eventid: 170
+  name: "inferno_extinguish"
+  keys {
+    type: 4
+    name: "entityid"
+  }
+  keys {
+    type: 2
+    name: "x"
+  }
+  keys {
+    type: 2
+    name: "y"
+  }
+  keys {
+    type: 2
+    name: "z"
+  }
+}
+descriptors {
+  eventid: 171
+  name: "decoy_firing"
+  keys {
+    type: 4
+    name: "userid"
+  }
+  keys {
+    type: 4
+    name: "entityid"
+  }
+  keys {
+    type: 2
+    name: "x"
+  }
+  keys {
+    type: 2
+    name: "y"
+  }
+  keys {
+    type: 2
+    name: "z"
+  }
+}
+descriptors {
+  eventid: 172
+  name: "bullet_impact"
+  keys {
+    type: 4
+    name: "userid"
+  }
+  keys {
+    type: 2
+    name: "x"
+  }
+  keys {
+    type: 2
+    name: "y"
+  }
+  keys {
+    type: 2
+    name: "z"
+  }
+}
+descriptors {
+  eventid: 173
+  name: "player_footstep"
+  keys {
+    type: 4
+    name: "userid"
+  }
+}
+descriptors {
+  eventid: 174
+  name: "player_jump"
+  keys {
+    type: 4
+    name: "userid"
+  }
+}
+descriptors {
+  eventid: 175
+  name: "player_blind"
+  keys {
+    type: 4
+    name: "userid"
+  }
+  keys {
+    type: 4
+    name: "attacker"
+  }
+  keys {
+    type: 4
+    name: "entityid"
+  }
+  keys {
+    type: 2
+    name: "blind_duration"
+  }
+}
+descriptors {
+  eventid: 176
+  name: "player_falldamage"
+  keys {
+    type: 4
+    name: "userid"
+  }
+  keys {
+    type: 2
+    name: "damage"
+  }
+}
+descriptors {
+  eventid: 177
+  name: "door_moving"
+  keys {
+    type: 3
+    name: "entindex"
+  }
+  keys {
+    type: 4
+    name: "userid"
+  }
+}
+descriptors {
+  eventid: 178
+  name: "round_freeze_end"
+}
+descriptors {
+  eventid: 179
+  name: "mb_input_lock_success"
+}
+descriptors {
+  eventid: 180
+  name: "mb_input_lock_cancel"
+}
+descriptors {
+  eventid: 181
+  name: "nav_blocked"
+  keys {
+    type: 3
+    name: "area"
+  }
+  keys {
+    type: 6
+    name: "blocked"
+  }
+}
+descriptors {
+  eventid: 182
+  name: "nav_generate"
+}
+descriptors {
+  eventid: 183
+  name: "achievement_info_loaded"
+}
+descriptors {
+  eventid: 184
+  name: "spec_target_updated"
+  keys {
+    type: 5
+    name: "userid"
+  }
+}
+descriptors {
+  eventid: 185
+  name: "spec_mode_updated"
+  keys {
+    type: 5
+    name: "userid"
+  }
+}
+descriptors {
+  eventid: 186
+  name: "hltv_changed_mode"
+  keys {
+    type: 3
+    name: "oldmode"
+  }
+  keys {
+    type: 3
+    name: "newmode"
+  }
+  keys {
+    type: 3
+    name: "obs_target"
+  }
+}
+descriptors {
+  eventid: 187
+  name: "cs_game_disconnected"
+}
+descriptors {
+  eventid: 188
+  name: "cs_win_panel_round"
+  keys {
+    type: 6
+    name: "show_timer_defend"
+  }
+  keys {
+    type: 6
+    name: "show_timer_attack"
+  }
+  keys {
+    type: 4
+    name: "timer_time"
+  }
+  keys {
+    type: 5
+    name: "final_event"
+  }
+  keys {
+    type: 1
+    name: "funfact_token"
+  }
+  keys {
+    type: 4
+    name: "funfact_player"
+  }
+  keys {
+    type: 3
+    name: "funfact_data1"
+  }
+  keys {
+    type: 3
+    name: "funfact_data2"
+  }
+  keys {
+    type: 3
+    name: "funfact_data3"
+  }
+}
+descriptors {
+  eventid: 189
+  name: "cs_win_panel_match"
+}
+descriptors {
+  eventid: 190
+  name: "cs_match_end_restart"
+}
+descriptors {
+  eventid: 191
+  name: "cs_pre_restart"
+}
+descriptors {
+  eventid: 192
+  name: "show_freezepanel"
+  keys {
+    type: 4
+    name: "victim"
+  }
+  keys {
+    type: 4
+    name: "killer"
+  }
+  keys {
+    type: 4
+    name: "hits_taken"
+  }
+  keys {
+    type: 4
+    name: "damage_taken"
+  }
+  keys {
+    type: 4
+    name: "hits_given"
+  }
+  keys {
+    type: 4
+    name: "damage_given"
+  }
+}
+descriptors {
+  eventid: 193
+  name: "hide_freezepanel"
+}
+descriptors {
+  eventid: 194
+  name: "freezecam_started"
+}
+descriptors {
+  eventid: 195
+  name: "player_avenged_teammate"
+  keys {
+    type: 4
+    name: "avenger_id"
+  }
+  keys {
+    type: 4
+    name: "avenged_player_id"
+  }
+}
+descriptors {
+  eventid: 196
+  name: "achievement_earned_local"
+  keys {
+    type: 4
+    name: "achievement"
+  }
+  keys {
+    type: 4
+    name: "splitscreenplayer"
+  }
+}
+descriptors {
+  eventid: 197
+  name: "item_found"
+  keys {
+    type: 5
+    name: "player"
+  }
+  keys {
+    type: 5
+    name: "quality"
+  }
+  keys {
+    type: 5
+    name: "method"
+  }
+  keys {
+    type: 3
+    name: "itemdef"
+  }
+  keys {
+    type: 3
+    name: "itemid"
+  }
+}
+descriptors {
+  eventid: 198
+  name: "repost_xbox_achievements"
+  keys {
+    type: 4
+    name: "splitscreenplayer"
+  }
+}
+descriptors {
+  eventid: 199
+  name: "match_end_conditions"
+  keys {
+    type: 3
+    name: "frags"
+  }
+  keys {
+    type: 3
+    name: "max_rounds"
+  }
+  keys {
+    type: 3
+    name: "win_rounds"
+  }
+  keys {
+    type: 3
+    name: "time"
+  }
+}
+descriptors {
+  eventid: 200
+  name: "round_mvp"
+  keys {
+    type: 4
+    name: "userid"
+  }
+  keys {
+    type: 4
+    name: "reason"
+  }
+  keys {
+    type: 3
+    name: "value"
+  }
+  keys {
+    type: 3
+    name: "musickitmvps"
+  }
+  keys {
+    type: 5
+    name: "nomusic"
+  }
+}
+descriptors {
+  eventid: 201
+  name: "show_survival_respawn_status"
+  keys {
+    type: 1
+    name: "loc_token"
+  }
+  keys {
+    type: 3
+    name: "duration"
+  }
+  keys {
+    type: 4
+    name: "userid"
+  }
+}
+descriptors {
+  eventid: 202
+  name: "client_disconnect"
+}
+descriptors {
+  eventid: 203
+  name: "gg_player_levelup"
+  keys {
+    type: 4
+    name: "userid"
+  }
+  keys {
+    type: 4
+    name: "weaponrank"
+  }
+  keys {
+    type: 1
+    name: "weaponname"
+  }
+}
+descriptors {
+  eventid: 204
+  name: "ggtr_player_levelup"
+  keys {
+    type: 4
+    name: "userid"
+  }
+  keys {
+    type: 4
+    name: "weaponrank"
+  }
+  keys {
+    type: 1
+    name: "weaponname"
+  }
+}
+descriptors {
+  eventid: 205
+  name: "assassination_target_killed"
+  keys {
+    type: 4
+    name: "target"
+  }
+  keys {
+    type: 4
+    name: "killer"
+  }
+}
+descriptors {
+  eventid: 206
+  name: "ggprogressive_player_levelup"
+  keys {
+    type: 4
+    name: "userid"
+  }
+  keys {
+    type: 4
+    name: "weaponrank"
+  }
+  keys {
+    type: 1
+    name: "weaponname"
+  }
+}
+descriptors {
+  eventid: 207
+  name: "gg_killed_enemy"
+  keys {
+    type: 4
+    name: "victimid"
+  }
+  keys {
+    type: 4
+    name: "attackerid"
+  }
+  keys {
+    type: 4
+    name: "dominated"
+  }
+  keys {
+    type: 4
+    name: "revenge"
+  }
+  keys {
+    type: 6
+    name: "bonus"
+  }
+}
+descriptors {
+  eventid: 208
+  name: "gg_final_weapon_achieved"
+  keys {
+    type: 4
+    name: "playerid"
+  }
+}
+descriptors {
+  eventid: 209
+  name: "gg_bonus_grenade_achieved"
+  keys {
+    type: 4
+    name: "userid"
+  }
+}
+descriptors {
+  eventid: 210
+  name: "switch_team"
+  keys {
+    type: 4
+    name: "numPlayers"
+  }
+  keys {
+    type: 4
+    name: "numSpectators"
+  }
+  keys {
+    type: 4
+    name: "avg_rank"
+  }
+  keys {
+    type: 4
+    name: "numTSlotsFree"
+  }
+  keys {
+    type: 4
+    name: "numCTSlotsFree"
+  }
+}
+descriptors {
+  eventid: 211
+  name: "gg_leader"
+  keys {
+    type: 4
+    name: "playerid"
+  }
+}
+descriptors {
+  eventid: 212
+  name: "gg_team_leader"
+  keys {
+    type: 4
+    name: "playerid"
+  }
+}
+descriptors {
+  eventid: 213
+  name: "gg_player_impending_upgrade"
+  keys {
+    type: 4
+    name: "userid"
+  }
+}
+descriptors {
+  eventid: 214
+  name: "write_profile_data"
+}
+descriptors {
+  eventid: 215
+  name: "trial_time_expired"
+  keys {
+    type: 4
+    name: "slot"
+  }
+}
+descriptors {
+  eventid: 216
+  name: "update_matchmaking_stats"
+}
+descriptors {
+  eventid: 217
+  name: "player_reset_vote"
+  keys {
+    type: 4
+    name: "userid"
+  }
+  keys {
+    type: 6
+    name: "vote"
+  }
+}
+descriptors {
+  eventid: 218
+  name: "enable_restart_voting"
+  keys {
+    type: 6
+    name: "enable"
+  }
+}
+descriptors {
+  eventid: 219
+  name: "sfuievent"
+  keys {
+    type: 1
+    name: "action"
+  }
+  keys {
+    type: 1
+    name: "data"
+  }
+  keys {
+    type: 5
+    name: "slot"
+  }
+}
+descriptors {
+  eventid: 220
+  name: "start_vote"
+  keys {
+    type: 4
+    name: "userid"
+  }
+  keys {
+    type: 5
+    name: "type"
+  }
+  keys {
+    type: 4
+    name: "vote_parameter"
+  }
+}
+descriptors {
+  eventid: 221
+  name: "player_given_c4"
+  keys {
+    type: 4
+    name: "userid"
+  }
+}
+descriptors {
+  eventid: 222
+  name: "player_become_ghost"
+  keys {
+    type: 4
+    name: "userid"
+  }
+}
+descriptors {
+  eventid: 223
+  name: "gg_reset_round_start_sounds"
+  keys {
+    type: 4
+    name: "userid"
+  }
+}
+descriptors {
+  eventid: 224
+  name: "tr_player_flashbanged"
+  keys {
+    type: 4
+    name: "userid"
+  }
+}
+descriptors {
+  eventid: 225
+  name: "tr_mark_complete"
+  keys {
+    type: 4
+    name: "complete"
+  }
+}
+descriptors {
+  eventid: 226
+  name: "tr_mark_best_time"
+  keys {
+    type: 3
+    name: "time"
+  }
+}
+descriptors {
+  eventid: 227
+  name: "tr_exit_hint_trigger"
+}
+descriptors {
+  eventid: 228
+  name: "bot_takeover"
+  keys {
+    type: 4
+    name: "userid"
+  }
+  keys {
+    type: 4
+    name: "botid"
+  }
+  keys {
+    type: 4
+    name: "index"
+  }
+}
+descriptors {
+  eventid: 229
+  name: "tr_show_finish_msgbox"
+  keys {
+    type: 4
+    name: "userid"
+  }
+}
+descriptors {
+  eventid: 230
+  name: "tr_show_exit_msgbox"
+  keys {
+    type: 4
+    name: "userid"
+  }
+}
+descriptors {
+  eventid: 231
+  name: "reset_player_controls"
+}
+descriptors {
+  eventid: 232
+  name: "jointeam_failed"
+  keys {
+    type: 4
+    name: "userid"
+  }
+  keys {
+    type: 5
+    name: "reason"
+  }
+}
+descriptors {
+  eventid: 233
+  name: "teamchange_pending"
+  keys {
+    type: 4
+    name: "userid"
+  }
+  keys {
+    type: 5
+    name: "toteam"
+  }
+}
+descriptors {
+  eventid: 234
+  name: "material_default_complete"
+}
+descriptors {
+  eventid: 235
+  name: "cs_prev_next_spectator"
+  keys {
+    type: 6
+    name: "next"
+  }
+}
+descriptors {
+  eventid: 237
+  name: "nextlevel_changed"
+  keys {
+    type: 1
+    name: "nextlevel"
+  }
+  keys {
+    type: 1
+    name: "mapgroup"
+  }
+  keys {
+    type: 1
+    name: "skirmishmode"
+  }
+}
+descriptors {
+  eventid: 238
+  name: "seasoncoin_levelup"
+  keys {
+    type: 4
+    name: "player"
+  }
+  keys {
+    type: 4
+    name: "category"
+  }
+  keys {
+    type: 4
+    name: "rank"
+  }
+}
+descriptors {
+  eventid: 239
+  name: "tournament_reward"
+  keys {
+    type: 3
+    name: "defindex"
+  }
+  keys {
+    type: 3
+    name: "totalrewards"
+  }
+  keys {
+    type: 3
+    name: "accountid"
+  }
+}
+descriptors {
+  eventid: 240
+  name: "start_halftime"
+}
+descriptors {
+  eventid: 241
+  name: "ammo_refill"
+  keys {
+    type: 4
+    name: "userid"
+  }
+  keys {
+    type: 6
+    name: "success"
+  }
+}
+descriptors {
+  eventid: 242
+  name: "parachute_pickup"
+  keys {
+    type: 4
+    name: "userid"
+  }
+}
+descriptors {
+  eventid: 243
+  name: "parachute_deploy"
+  keys {
+    type: 4
+    name: "userid"
+  }
+}
+descriptors {
+  eventid: 244
+  name: "dronegun_attack"
+  keys {
+    type: 4
+    name: "userid"
+  }
+}
+descriptors {
+  eventid: 245
+  name: "drone_dispatched"
+  keys {
+    type: 4
+    name: "userid"
+  }
+  keys {
+    type: 4
+    name: "priority"
+  }
+  keys {
+    type: 4
+    name: "drone_dispatched"
+  }
+}
+descriptors {
+  eventid: 246
+  name: "loot_crate_visible"
+  keys {
+    type: 4
+    name: "userid"
+  }
+  keys {
+    type: 4
+    name: "subject"
+  }
+  keys {
+    type: 1
+    name: "type"
+  }
+}
+descriptors {
+  eventid: 247
+  name: "loot_crate_opened"
+  keys {
+    type: 4
+    name: "userid"
+  }
+  keys {
+    type: 1
+    name: "type"
+  }
+}
+descriptors {
+  eventid: 248
+  name: "open_crate_instr"
+  keys {
+    type: 4
+    name: "userid"
+  }
+  keys {
+    type: 4
+    name: "subject"
+  }
+  keys {
+    type: 1
+    name: "type"
+  }
+}
+descriptors {
+  eventid: 249
+  name: "smoke_beacon_paradrop"
+  keys {
+    type: 4
+    name: "userid"
+  }
+  keys {
+    type: 4
+    name: "paradrop"
+  }
+}
+descriptors {
+  eventid: 250
+  name: "survival_paradrop_spawn"
+  keys {
+    type: 4
+    name: "entityid"
+  }
+}
+descriptors {
+  eventid: 251
+  name: "survival_paradrop_break"
+  keys {
+    type: 4
+    name: "entityid"
+  }
+}
+descriptors {
+  eventid: 252
+  name: "drone_cargo_detached"
+  keys {
+    type: 4
+    name: "userid"
+  }
+  keys {
+    type: 4
+    name: "cargo"
+  }
+  keys {
+    type: 6
+    name: "delivered"
+  }
+}
+descriptors {
+  eventid: 253
+  name: "drone_above_roof"
+  keys {
+    type: 4
+    name: "userid"
+  }
+  keys {
+    type: 4
+    name: "cargo"
+  }
+}
+descriptors {
+  eventid: 254
+  name: "choppers_incoming_warning"
+  keys {
+    type: 6
+    name: "global"
+  }
+}
+descriptors {
+  eventid: 255
+  name: "firstbombs_incoming_warning"
+  keys {
+    type: 6
+    name: "global"
+  }
+}
+descriptors {
+  eventid: 256
+  name: "dz_item_interaction"
+  keys {
+    type: 4
+    name: "userid"
+  }
+  keys {
+    type: 4
+    name: "subject"
+  }
+  keys {
+    type: 1
+    name: "type"
+  }
+}
+descriptors {
+  eventid: 257
+  name: "snowball_hit_player_face"
+  keys {
+    type: 4
+    name: "userid"
+  }
+}
+descriptors {
+  eventid: 258
+  name: "survival_teammate_respawn"
+  keys {
+    type: 4
+    name: "userid"
+  }
+}
+descriptors {
+  eventid: 259
+  name: "survival_no_respawns_warning"
+  keys {
+    type: 4
+    name: "userid"
+  }
+}
+descriptors {
+  eventid: 260
+  name: "survival_no_respawns_final"
+  keys {
+    type: 4
+    name: "userid"
+  }
+}
+descriptors {
+  eventid: 261
+  name: "player_ping"
+  keys {
+    type: 4
+    name: "userid"
+  }
+  keys {
+    type: 4
+    name: "entityid"
+  }
+  keys {
+    type: 2
+    name: "x"
+  }
+  keys {
+    type: 2
+    name: "y"
+  }
+  keys {
+    type: 2
+    name: "z"
+  }
+  keys {
+    type: 6
+    name: "urgent"
+  }
+}
+descriptors {
+  eventid: 262
+  name: "player_ping_stop"
+  keys {
+    type: 4
+    name: "entityid"
+  }
+}
+descriptors {
+  eventid: 263
+  name: "guardian_wave_restart"
+}
+descriptors {
+  eventid: 264
+  name: "hltv_status"
+  keys {
+    type: 3
+    name: "clients"
+  }
+  keys {
+    type: 3
+    name: "slots"
+  }
+  keys {
+    type: 4
+    name: "proxies"
+  }
+  keys {
+    type: 1
+    name: "master"
+  }
+  keys {
+    type: 3
+    name: "externaltotal"
+  }
+  keys {
+    type: 3
+    name: "externallinked"
+  }
+}
+descriptors {
+  eventid: 265
+  name: "hltv_cameraman"
+  keys {
+    type: 4
+    name: "index"
+  }
+}
+descriptors {
+  eventid: 266
+  name: "hltv_rank_camera"
+  keys {
+    type: 5
+    name: "index"
+  }
+  keys {
+    type: 2
+    name: "rank"
+  }
+  keys {
+    type: 4
+    name: "target"
+  }
+}
+descriptors {
+  eventid: 267
+  name: "hltv_rank_entity"
+  keys {
+    type: 4
+    name: "index"
+  }
+  keys {
+    type: 2
+    name: "rank"
+  }
+  keys {
+    type: 4
+    name: "target"
+  }
+}
+descriptors {
+  eventid: 268
+  name: "hltv_fixed"
+  keys {
+    type: 3
+    name: "posx"
+  }
+  keys {
+    type: 3
+    name: "posy"
+  }
+  keys {
+    type: 3
+    name: "posz"
+  }
+  keys {
+    type: 4
+    name: "theta"
+  }
+  keys {
+    type: 4
+    name: "phi"
+  }
+  keys {
+    type: 4
+    name: "offset"
+  }
+  keys {
+    type: 2
+    name: "fov"
+  }
+  keys {
+    type: 4
+    name: "target"
+  }
+}
+descriptors {
+  eventid: 269
+  name: "hltv_chase"
+  keys {
+    type: 4
+    name: "target1"
+  }
+  keys {
+    type: 4
+    name: "target2"
+  }
+  keys {
+    type: 4
+    name: "distance"
+  }
+  keys {
+    type: 4
+    name: "theta"
+  }
+  keys {
+    type: 4
+    name: "phi"
+  }
+  keys {
+    type: 5
+    name: "inertia"
+  }
+  keys {
+    type: 5
+    name: "ineye"
+  }
+}
+descriptors {
+  eventid: 270
+  name: "hltv_message"
+  keys {
+    type: 1
+    name: "text"
+  }
+}
+descriptors {
+  eventid: 271
+  name: "hltv_title"
+  keys {
+    type: 1
+    name: "text"
+  }
+}
+descriptors {
+  eventid: 272
+  name: "hltv_chat"
+  keys {
+    type: 1
+    name: "text"
+  }
+}
+descriptors {
+  eventid: 273
+  name: "hltv_changed_target"
+  keys {
+    type: 3
+    name: "mode"
+  }
+  keys {
+    type: 3
+    name: "old_target"
+  }
+  keys {
+    type: 3
+    name: "obs_target"
+  }
+}
