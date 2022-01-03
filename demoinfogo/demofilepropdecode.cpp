@@ -280,7 +280,7 @@ Prop_t *DecodeProp( CBitRead &entityBitBuffer, FlattenedPropEntry *pFlattenedPro
 
 	if ( !bQuiet )
 	{
-		printf( "Field: %d, %s = ", nFieldIndex, pSendProp->var_name().c_str() );
+		//printf( "Field: %d, %s = ", nFieldIndex, pSendProp->var_name().c_str() );
 	}
 	switch ( pSendProp->type() )
 	{
@@ -310,7 +310,7 @@ Prop_t *DecodeProp( CBitRead &entityBitBuffer, FlattenedPropEntry *pFlattenedPro
 	}
 	if ( !bQuiet )
 	{
-		pResult->Print();
+		//pResult->Print();
 	}
 
 	return pResult;

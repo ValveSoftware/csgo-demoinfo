@@ -171,13 +171,6 @@ struct EntityEntry
 	}
 	void AddOrUpdateProp( FlattenedPropEntry *pFlattenedProp, Prop_t *pPropValue )
 	{
-		//HERE
-		if ( m_uClass == 40 && pFlattenedProp->m_prop->var_name().compare( "m_vecOrigin" ) == 0 )
-		{
-			printf("got vec origin!\n" );
-			printf("%f \n", pPropValue->m_value.m_vector.x);
-			printf("%f \n", pPropValue->m_value.m_vector.y);
-		}
 		PropEntry *pProp = FindProp( pFlattenedProp->m_prop->var_name().c_str() );
 		if ( pProp )
 		{
@@ -230,6 +223,7 @@ public:
 	bool Open( const char *filename ); 
 	void DoDump();
 	void HandleDemoPacket();
+	void DisplayPlayerInfo();
 
 public:
 	void DumpDemoPacket( CBitRead &buf, int length );

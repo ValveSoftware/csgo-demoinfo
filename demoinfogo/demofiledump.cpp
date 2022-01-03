@@ -96,13 +96,6 @@ void CDemoFileDump::MsgPrintf( const ::google::protobuf::Message& msg, int size,
 
 		// Print the message type and size
 		printf( "---- %s (%d bytes) -----------------\n", TypeName.c_str(), size );
-		printf("yoyoyo");
-
-		if(msg.GetTypeName().compare("CNETMsg_Tick") == 0){
-			int tick = msg.GetReflection()->GetUInt32(msg, msg.GetDescriptor()->field(0));
-			printf("%d \n", tick);
-			printf("hi \n");
-		}
 
 		va_start( vlist, fmt);
 		vprintf( fmt, vlist );
@@ -189,7 +182,6 @@ void CDemoFileDump::DumpUserMessage( const void *parseBuffer, int BufferSize )
 
 #undef HANDLE_UserMsg
 		}
-
 	}
 }
 
@@ -205,16 +197,17 @@ void PrintNetMessage( CDemoFileDump& Demo, const void *parseBuffer, int BufferSi
 			Demo.m_GameEventList.CopyFrom( msg );
 		}
 
-		printf("hihihihih\n");
 		Demo.MsgPrintf( msg, BufferSize, "%s", msg.DebugString().c_str() );
 	}
 }
 
+/*
 template <>
 void PrintNetMessage< CSVCMsg_UserMessage, svc_UserMessage >( CDemoFileDump& Demo, const void *parseBuffer, int BufferSize )
 {
 	Demo.DumpUserMessage( parseBuffer, BufferSize );
 }
+*/
 
 player_info_t *FindPlayerByEntity( int entityId )
 {
@@ -344,7 +337,7 @@ bool HandlePlayerConnectDisconnectEvents( const CSVCMsg_GameEvent &msg, const CS
 			if(!existing) {
 				if (g_bDumpGameEvents)
 				{
-					printf("Player %s %s (id:%d) connected.\n", newPlayer.guid, name, userid);
+					printf("Player %s %s (id:%d) connected. EntityID: %d \n", newPlayer.guid, name, userid, newPlayer.entityID + 1);
 				}
 				s_PlayerInfos.push_back(newPlayer);
 			}
@@ -379,6 +372,11 @@ bool ShowPlayerInfo( const char *pField, int nIndex, bool bShowDetails = true, b
 			{
 				PropEntry *pXYProp = pEntity->FindProp( "m_vecOrigin" );
 				PropEntry *pZProp = pEntity->FindProp( "m_vecOrigin[2]" );
+				/*
+				//Probing player entity properties
+				for (int i = 0; i < pEntity->m_props.size(); i++) {
+					printf("%s \n", pEntity->m_props.at(i)->m_pFlattenedProp->m_prop->var_name().c_str());
+				}*/
 				if ( pXYProp && pZProp )
 				{
 					if ( bCSV )
@@ -420,6 +418,76 @@ bool ShowPlayerInfo( const char *pField, int nIndex, bool bShowDetails = true, b
 		return true;
 	}
 	return false;
+}
+
+void CDemoFileDump::DisplayPlayerInfo()
+{
+	player_info_t *pPlayerInfo;
+	EntityEntry *pEntity;
+	printf( "Player positions: \n" );
+	for( int i = 0; i < s_PlayerInfos.size(); i++ )
+	{
+		printf( " %s (id:%d)\n", s_PlayerInfos.at( i ).name, s_PlayerInfos.at(i).userID );
+		pEntity = FindEntity( s_PlayerInfos.at( i ).entityID + 1 );
+		if( pEntity )
+		{
+			//Getting xyz coordindates
+			PropEntry *pXYProp = pEntity->FindProp( "m_vecOrigin" );
+			PropEntry *pZProp = pEntity->FindProp( "m_vecOrigin[2]" );
+			if ( pXYProp && pZProp )
+			{
+				printf( "  position: %f, %f, %f\n", pXYProp->m_pPropValue->m_value.m_vector.x, pXYProp->m_pPropValue->m_value.m_vector.y, pZProp->m_pPropValue->m_value.m_float );
+			}
+
+			//Getting aim coordinates
+			PropEntry *pAngle0Prop = pEntity->FindProp( "m_angEyeAngles[0]" );
+			PropEntry *pAngle1Prop = pEntity->FindProp( "m_angEyeAngles[1]" );
+			if ( pAngle0Prop && pAngle1Prop )
+			{
+				printf( "  facing: pitch:%f, yaw:%f\n", pAngle0Prop->m_pPropValue->m_value.m_float, pAngle1Prop->m_pPropValue->m_value.m_float );
+			}
+
+			//Getting health and armour
+			PropEntry *pHealth = pEntity->FindProp( "m_iHealth" );
+			PropEntry *pArmour = pEntity->FindProp( "m_ArmorValue" );
+			PropEntry *pHelmet = pEntity->FindProp( "m_bHasHelmet" );
+			if( pHealth && pArmour && pHelmet )
+			{
+				if( pHelmet->m_pPropValue->m_value.m_int == 0)
+				{
+					printf("  health: %d, armour: %d, no helmet\n", pHealth->m_pPropValue->m_value.m_int, pArmour->m_pPropValue->m_value.m_int);
+				}
+				else 
+				{
+					printf("  health: %d, armour: %d, helmet\n", pHealth->m_pPropValue->m_value.m_int, pArmour->m_pPropValue->m_value.m_int);
+				}
+			}
+
+			//Getting active weapon and total equipment value
+			PropEntry *pActiveWeapon = pEntity->FindProp( "m_hActiveWeapon" );
+			PropEntry *pEquipValue = pEntity->FindProp( "m_unCurrentEquipmentValue" );
+			if( pActiveWeapon && pEquipValue )
+			{
+				printf("  active weapon: s, total value: %d\n", pEquipValue->m_pPropValue->m_value.m_int);
+			}
+		}
+	}
+}
+
+//Parses tick messages
+template <>
+void PrintNetMessage< CNETMsg_Tick, net_Tick >( CDemoFileDump& Demo, const void *parseBuffer, int BufferSize )
+{
+	CNETMsg_Tick msg;
+
+	//Print out previous tick's player information
+	Demo.DisplayPlayerInfo();
+
+	if ( msg.ParseFromArray( parseBuffer, BufferSize ) )
+	{
+		int tick = msg.tick();
+		printf("---- Tick Number %d ----\n", tick);
+	}
 }
 
 void HandlePlayerDeath( const CSVCMsg_GameEvent &msg, const CSVCMsg_GameEventList::descriptor_t *pDescriptor )
@@ -553,6 +621,7 @@ void ParseGameEvent( const CSVCMsg_GameEvent &msg, const CSVCMsg_GameEventList::
 	}
 }
 
+//Parses game event messages
 template <>
 void PrintNetMessage< CSVCMsg_GameEvent, svc_GameEvent >( CDemoFileDump& Demo, const void *parseBuffer, int BufferSize )
 {
@@ -710,9 +779,9 @@ void ParseStringTableUpdate( CBitRead &buf, int entries, int nMaxEntries, int us
 
 			if ( g_bDumpStringTables )
 			{
-				printf( "player info\n{\n %s:true\n xuid:%lld\n name:%s\n userID:%d\n guid:%s\n friendsID:%d\n friendsName:%s\n fakeplayer:%d\n ishltv:%d\n filesDownloaded:%d\n}\n",
+				printf( "player info\n{\n %s:true\n xuid:%lld\n name:%s\n userID:%d\n guid:%s\n friendsID:%d\n friendsName:%s\n fakeplayer:%d\n ishltv:%d\n filesDownloaded:%d\n entityID:%d\n}\n",
 					bAdded ? "adding" : "updating", playerInfo.xuid, playerInfo.name, playerInfo.userID, playerInfo.guid, playerInfo.friendsID,
-					playerInfo.friendsName, playerInfo.fakeplayer, playerInfo.ishltv, playerInfo.filesDownloaded );
+					playerInfo.friendsName, playerInfo.fakeplayer, playerInfo.ishltv, playerInfo.filesDownloaded, playerInfo.entityID );
 			}
 		}
 		else
@@ -735,6 +804,7 @@ void ParseStringTableUpdate( CBitRead &buf, int entries, int nMaxEntries, int us
 	}
 }
 
+/*
 template <>
 void PrintNetMessage< CSVCMsg_CreateStringTable, svc_CreateStringTable >( CDemoFileDump& Demo, const void *parseBuffer, int BufferSize )
 {
@@ -784,6 +854,7 @@ void PrintNetMessage< CSVCMsg_UpdateStringTable, svc_UpdateStringTable >( CDemoF
 		}
 	}
 }
+*/
 
 void RecvTable_ReadInfos( const CSVCMsg_SendTable& msg )
 {
@@ -811,6 +882,7 @@ void RecvTable_ReadInfos( const CSVCMsg_SendTable& msg )
 	}
 }
 
+/*
 template <>
 void PrintNetMessage< CSVCMsg_SendTable, svc_SendTable >( CDemoFileDump& Demo, const void *parseBuffer, int BufferSize )
 {
@@ -820,7 +892,7 @@ void PrintNetMessage< CSVCMsg_SendTable, svc_SendTable >( CDemoFileDump& Demo, c
 	{
 		RecvTable_ReadInfos( msg );
 	}
-}
+}*/
 
 CSVCMsg_SendTable *GetTableByClassID( uint32 nClassID )
 {
@@ -1074,17 +1146,17 @@ bool ReadNewEntity( CBitRead &entityBitBuffer, EntityEntry *pEntity )
 	} while (index != -1);
 
 	CSVCMsg_SendTable *pTable = GetTableByClassID( pEntity->m_uClass );
+	/*
 	if ( g_bDumpPacketEntities )
 	{
-		printf("this is where we update entities\n");
 		printf( "Table: %s\n", pTable->net_table_name().c_str() );
-	}
+	}*/
 	for ( unsigned int i = 0; i < fieldIndices.size(); i++ )
 	{
 		FlattenedPropEntry *pSendProp = GetSendPropByIndex( pEntity->m_uClass, fieldIndices[ i ] );
 		if ( pSendProp )
 		{
-			Prop_t *pProp = DecodeProp( entityBitBuffer, pSendProp, pEntity->m_uClass, fieldIndices[ i ], !g_bDumpPacketEntities );
+			Prop_t *pProp = DecodeProp( entityBitBuffer, pSendProp, pEntity->m_uClass, fieldIndices[ i ], !g_bDumpPacketEntities );	
 			pEntity->AddOrUpdateProp( pSendProp, pProp );
 		}
 		else
@@ -1141,6 +1213,7 @@ void RemoveEntity( int nEntity )
 	}
 }
 
+//Parses entity messages
 template <>
 void PrintNetMessage< CSVCMsg_PacketEntities, svc_PacketEntities >( CDemoFileDump& Demo, const void *parseBuffer, int BufferSize )
 {
@@ -1222,10 +1295,11 @@ void PrintNetMessage< CSVCMsg_PacketEntities, svc_PacketEntities >( CDemoFileDum
 						{
 							uint32 uClass = entityBitBuffer.ReadUBitLong( s_nServerClassBits );
 							uint32 uSerialNum = entityBitBuffer.ReadUBitLong( NUM_NETWORKED_EHANDLE_SERIAL_NUMBER_BITS );
+							/*
 							if ( g_bDumpPacketEntities )
 							{
 								printf( "Entity Enters PVS: id:%d, class:%d, serial:%d\n", nNewEntity, uClass, uSerialNum );
-							}
+							}*/
 							EntityEntry *pEntity = AddEntity( nNewEntity, uClass, uSerialNum );
 							if ( !ReadNewEntity( entityBitBuffer, pEntity ) )
 							{
@@ -1239,7 +1313,7 @@ void PrintNetMessage< CSVCMsg_PacketEntities, svc_PacketEntities >( CDemoFileDum
 						{
 							if ( !bAsDelta )  // Should never happen on a full update.
 							{
-								printf( "WARNING: LeavePVS on full update" );
+								//printf( "WARNING: LeavePVS on full update" );
 								updateType = Failed;	// break out
 								assert( 0 );
 							}
@@ -1249,11 +1323,11 @@ void PrintNetMessage< CSVCMsg_PacketEntities, svc_PacketEntities >( CDemoFileDum
 								{
 									if ( UpdateFlags & FHDR_DELETE )
 									{
-										printf( "Entity leaves PVS and is deleted: id:%d\n", nNewEntity );
+										//printf( "Entity leaves PVS and is deleted: id:%d\n", nNewEntity );
 									}
 									else
 									{
-										printf( "Entity leaves PVS: id:%d\n", nNewEntity );
+										//printf( "Entity leaves PVS: id:%d\n", nNewEntity );
 									}
 								}
 								RemoveEntity( nNewEntity );
@@ -1266,10 +1340,11 @@ void PrintNetMessage< CSVCMsg_PacketEntities, svc_PacketEntities >( CDemoFileDum
 							EntityEntry *pEntity = FindEntity( nNewEntity );
 							if ( pEntity )
 							{
+								/*
 								if ( g_bDumpPacketEntities )
 								{
 									printf( "Entity Delta update: id:%d, class:%d, serial:%d\n", pEntity->m_nEntity, pEntity->m_uClass, pEntity->m_uSerialNum );
-								}
+								}*/
 								if ( !ReadNewEntity( entityBitBuffer, pEntity ) )
 								{
 									printf( "*****Error reading entity! Bailing on this PacketEntities!\n" );
@@ -1287,7 +1362,7 @@ void PrintNetMessage< CSVCMsg_PacketEntities, svc_PacketEntities >( CDemoFileDum
 						{
 							if ( !bAsDelta )  // Should never happen on a full update.
 							{
-								printf( "WARNING: PreserveEnt on full update" );
+								//printf( "WARNING: PreserveEnt on full update" );
 								updateType = Failed;	// break out
 								assert( 0 );
 							}
@@ -1295,14 +1370,14 @@ void PrintNetMessage< CSVCMsg_PacketEntities, svc_PacketEntities >( CDemoFileDum
 							{
 								if ( nNewEntity >= MAX_EDICTS )
 								{
-									printf( "PreserveEnt: nNewEntity == MAX_EDICTS" );
+									//printf( "PreserveEnt: nNewEntity == MAX_EDICTS" );
 									assert( 0 );
 								}
 								else
 								{
 									if ( g_bDumpPacketEntities )
 									{
-										printf( "PreserveEnt: id:%d\n", nNewEntity );
+										//printf( "PreserveEnt: id:%d\n", nNewEntity );
 									}
 								}
 							}
@@ -1358,31 +1433,31 @@ void CDemoFileDump::DumpDemoPacket( CBitRead &buf, int length )
 		HANDLE_NetMsg( Disconnect );        // 1
 		HANDLE_NetMsg( File );              // 2
 		HANDLE_NetMsg( Tick );              // 4
-		HANDLE_NetMsg( StringCmd );         // 5
+		//HANDLE_NetMsg( StringCmd );         // 5
 		HANDLE_NetMsg( SetConVar );         // 6
-		HANDLE_NetMsg( SignonState );       // 7
+		//HANDLE_NetMsg( SignonState );       // 7
 		HANDLE_SvcMsg( ServerInfo );        // 8
 		HANDLE_SvcMsg( SendTable );         // 9
 		HANDLE_SvcMsg( ClassInfo );         // 10
 		HANDLE_SvcMsg( SetPause );          // 11
-		HANDLE_SvcMsg( CreateStringTable ); // 12
-		HANDLE_SvcMsg( UpdateStringTable ); // 13
-		HANDLE_SvcMsg( VoiceInit );         // 14
-		HANDLE_SvcMsg( VoiceData );         // 15
-		HANDLE_SvcMsg( Print );             // 16
-		HANDLE_SvcMsg( Sounds );            // 17
-		HANDLE_SvcMsg( SetView );           // 18
-		HANDLE_SvcMsg( FixAngle );          // 19
-		HANDLE_SvcMsg( CrosshairAngle );    // 20
-		HANDLE_SvcMsg( BSPDecal );          // 21
-		HANDLE_SvcMsg( UserMessage );       // 23
+		//HANDLE_SvcMsg( CreateStringTable ); // 12
+		//HANDLE_SvcMsg( UpdateStringTable ); // 13
+		//HANDLE_SvcMsg( VoiceInit );         // 14
+		//HANDLE_SvcMsg( VoiceData );         // 15
+		//HANDLE_SvcMsg( Print );             // 16
+		//HANDLE_SvcMsg( Sounds );            // 17
+		//HANDLE_SvcMsg( SetView );           // 18
+		//HANDLE_SvcMsg( FixAngle );          // 19
+		//HANDLE_SvcMsg( CrosshairAngle );    // 20
+		//HANDLE_SvcMsg( BSPDecal );          // 21
+		//HANDLE_SvcMsg( UserMessage );       // 23
 		HANDLE_SvcMsg( GameEvent );         // 25
 		HANDLE_SvcMsg( PacketEntities );    // 26
-		HANDLE_SvcMsg( TempEntities );      // 27
-		HANDLE_SvcMsg( Prefetch );          // 28
-		HANDLE_SvcMsg( Menu );              // 29
+		//HANDLE_SvcMsg( TempEntities );      // 27
+		//HANDLE_SvcMsg( Prefetch );          // 28
+		//HANDLE_SvcMsg( Menu );              // 29
 		HANDLE_SvcMsg( GameEventList );     // 30
-		HANDLE_SvcMsg( GetCvarValue );      // 31
+		//HANDLE_SvcMsg( GetCvarValue );      // 31
 
 #undef HANDLE_SvcMsg
 #undef HANDLE_NetMsg
