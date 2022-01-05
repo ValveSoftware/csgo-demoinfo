@@ -1835,6 +1835,31 @@ void CDemoFileDump::HandleGrenadeEvent( const CSVCMsg_GameEvent &msg, const CSVC
 	//TODO when removing/updating in array, access by matching entityid
 }
 
+void CDemoFileDump::HandleWeaponFire( const CSVCMsg_GameEvent &msg, const CSVCMsg_GameEventList::descriptor_t *pDescriptor )
+{
+	short userid;
+	const char *weapon;	
+	player_info_t* player;
+
+	userid = msg.keys( 0 ).val_short();
+	weapon = msg.keys( 1 ).val_string().c_str();
+
+	player = FindPlayerInfo( userid );
+
+	printf( "	----- %s fired weapon %s. -----\n", player->name, weapon );
+
+	//Probing active weapon id
+	EntityEntry *pEntity = FindEntity( player->entityID + 1 );
+	PropEntry *pActiveWeapon = pEntity->FindProp( "m_hActiveWeapon" );
+	int test;
+	int max = 11;
+	int mask = ( ( 1 << max ) - 1 );
+	test = pActiveWeapon->m_pPropValue->m_value.m_int & mask;
+	printf( "%d\n", test );
+
+	//TODO add weapon fire event to event array
+}
+
 void CDemoFileDump::HandlePlayerDeath( const CSVCMsg_GameEvent &msg, const CSVCMsg_GameEventList::descriptor_t *pDescriptor )
 {
 	int numKeys = msg.keys().size();
@@ -2011,7 +2036,13 @@ void CDemoFileDump::ParseGameEvent( const CSVCMsg_GameEvent &msg, const CSVCMsg_
 				HandleGrenadeEvent( msg, pDescriptor, DECOY_DETONATE );
 			}
 
+			//player_team, player_death, player_hurt, weapon_fire,
 
+			//Handling player game events
+			else if ( gameEvent.compare( "weapon_fire" ) == 0 )
+			{
+				HandleWeaponFire( msg, pDescriptor );
+			}
 
 
 			else if ( gameEvent.compare( "player_death" ) == 0 )
