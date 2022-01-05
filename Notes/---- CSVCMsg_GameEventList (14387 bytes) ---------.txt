@@ -1,11 +1,9 @@
 parsed by ParseGameEvents()
 
-//handles: weapon_fire, player_hurt, bomb_dropped, item_remove, item_equip, player_death, player_footstep, player_jump, smokegrenade_expired, weapon_zoom, weapon_reload,
-//  round_mvp, cs_win_panel_round, round_end, cs_win_panel_match, cs_win_panel_match, cs_round_final_beep, round_freeze_end, hltv_status, endmatch_cmm_start_reveal_items, announce_phase_end, 
-//  player_team, item_pickup, player_spawn, hltv_message, hltv_fixed, round_prestart, round_announce_warmup, round_poststart, player_connect_full, begin_new_match, cs_round_start_beep, round_announce_match_start
-//  other_death, hltv_chase, buytime_ended, bomb_beginplant, bomb_begin_defuse, bomb_planted, cs_pre_restart, round_officially_ended, bomb_pickup, bomb_dropped, bomb_defused, bomb_exploded, endmatch_cmm_start_reveal_items, announce_phase_end
-//  smokegrenade_detonate, flashbang_detonate, hegrenade_detonate, smoke_grenade_expired, molotov_detonate, decoy_detonate, decoy_started, tagrenade_detonate, inferno_startburn, inferno_expire
-//  inferno_extinguish, decoy_firing, player_blind, player_falldamage, 
+//  begin_new_match, round_start, round_freeze_end, round_end, round_officially_ended, 
+//    player_team, player_spawn, player_death, player_hurt, weapon_fire,    player_blind, item_equip, item_remove
+//    smokegrenade_detonate, smokegrenade_expired, flashbang_detonate, hegrenade_detonate, molotov_detonate, inferno_startburn, inferno_expire, inferno_extinguish, decoy_started, decoy_firing, decoy_detonate, 
+//    bomb_beginplant, bomb_abortplant, bomb_planted, bomb_begin_defuse, bomb_abort_defuse, bomb_defused, bomb_exploded, bomb_pickup, bomb_dropped
 
 ---- CSVCMsg_GameEventList (14387 bytes) -----------------
 descriptors {

@@ -129,7 +129,7 @@ int __cdecl main( int argc, char *argv[] )
 
 	if( DemoFileDump.Open( argv[ nFileArgument ] ) )
 	{
-		DemoFileDump.DoDump();
+		DemoFileDump.ParseToEnd();
 	}
 
 	return 1;

@@ -253,7 +253,7 @@ Prop_t *Array_Decode( CBitRead &entityBitBuffer, FlattenedPropEntry *pFlattenedP
 
 	if ( !bQuiet )
 	{
-		printf( "array with %d elements of %d max\n", nElements, nNumElements );
+		//printf( "array with %d elements of %d max\n", nElements, nNumElements );
 	}
 
 	for ( int i = 0; i < nElements; i++ )
