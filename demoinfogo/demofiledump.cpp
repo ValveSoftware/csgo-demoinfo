@@ -1413,6 +1413,7 @@ void CDemoFileDump::DumpDemoPacket( CBitRead &buf, int length )
 
 /************************Display Information************************/
 
+//can remove/refactor this
 bool CDemoFileDump::ShowPlayerInfo( const char *pField, int nIndex, bool bShowDetails, bool bCSV )
 {
 	player_info_t *pPlayerInfo = FindPlayerInfo( nIndex );
@@ -1514,13 +1515,13 @@ void CDemoFileDump::DisplayPlayerInfo()
 			PropEntry *pHelmet = pEntity->FindProp( "m_bHasHelmet" );
 			if( pHealth && pArmour )
 			{
-				if( pHelmet && pHelmet->m_pPropValue->m_value.m_int == 1)
+				if( pHelmet && pHelmet->m_pPropValue->m_value.m_int == 1 )
 				{
-					printf( "  health: %d, armour: %d, helmet\n", pHealth->m_pPropValue->m_value.m_int, pArmour->m_pPropValue->m_value.m_int);
+					printf( "  health: %d, armour: %d, helmet\n", pHealth->m_pPropValue->m_value.m_int, pArmour->m_pPropValue->m_value.m_int );
 				}
 				else 
 				{
-					printf( "  health: %d, armour: %d, no helmet\n", pHealth->m_pPropValue->m_value.m_int, pArmour->m_pPropValue->m_value.m_int);
+					printf( "  health: %d, armour: %d, no helmet\n", pHealth->m_pPropValue->m_value.m_int, pArmour->m_pPropValue->m_value.m_int );
 				}
 			}
 			else{
@@ -1528,7 +1529,7 @@ void CDemoFileDump::DisplayPlayerInfo()
 			}
 			//Getting defuse kit
 			PropEntry *pDefuser = pEntity->FindProp( "m_bHasDefuser" );
-			if( pDefuser && pDefuser->m_pPropValue->m_value.m_int == 1){
+			if( pDefuser && pDefuser->m_pPropValue->m_value.m_int == 1 ){
 				printf( "  has kit\n");
 			}
 			//Getting active weapon and total equipment value
@@ -1536,7 +1537,7 @@ void CDemoFileDump::DisplayPlayerInfo()
 			PropEntry *pMoney = pEntity->FindProp( "m_iAccount" );
 			if( pActiveWeapon && pMoney )
 			{
-				printf( "  active weapon: s, money: %d\n", pMoney->m_pPropValue->m_value.m_int);
+				printf( "  active weapon: s, money: %d\n", pMoney->m_pPropValue->m_value.m_int );
 				pActiveWeapon->m_pPropValue->Print();
 			}
 			//Getting flashed state
@@ -1544,7 +1545,13 @@ void CDemoFileDump::DisplayPlayerInfo()
 			//Just check if duration > 0, indicating player is flashed
 			PropEntry *pFlash = pEntity->FindProp( "m_flFlashDuration" );
 			if( pFlash ){
-				printf( "  flashed: %f\n", pFlash->m_pPropValue->m_value.m_float);
+				printf( "  flashed: %f\n", pFlash->m_pPropValue->m_value.m_float );
+			}
+
+			//Getting team
+			PropEntry *pTeam = pEntity->FindProp( "m_iTeamNum" );
+			if( pTeam ){
+				printf( "  team: %d\n", pTeam->m_pPropValue->m_value.m_int );
 			}
 		}
 	}	
@@ -1553,6 +1560,8 @@ void CDemoFileDump::DisplayPlayerInfo()
 
 /************************Game Event Handling************************/
 
+
+//TODO refactor this
 void CDemoFileDump::HandlePlayerConnection( const CSVCMsg_GameEvent &msg, const CSVCMsg_GameEventList::descriptor_t *pDescriptor, bool connection )
 {
 	int numKeys = msg.keys().size();
@@ -1632,9 +1641,9 @@ void CDemoFileDump::HandlePlayerConnection( const CSVCMsg_GameEvent &msg, const 
 //Call this if planter gets killed as well
 void CDemoFileDump::HandleBombEvent( const CSVCMsg_GameEvent &msg, const CSVCMsg_GameEventList::descriptor_t *pDescriptor, BombEvent event )
 {
-	short userid = msg.keys( 0 ).val_short();
-	long bombsite;
-	char* action;
+	int userid = msg.keys( 0 ).val_short();
+	int bombsite = -1;
+	char* action = NULL;
 	player_info_t* planter = FindPlayerInfo( userid );
 	EntityEntry *pEntity = FindEntity( planter->entityID + 1 );
 
@@ -1738,9 +1747,10 @@ void CDemoFileDump::HandleBombEvent( const CSVCMsg_GameEvent &msg, const CSVCMsg
 
 void CDemoFileDump::HandleGrenadeEvent( const CSVCMsg_GameEvent &msg, const CSVCMsg_GameEventList::descriptor_t *pDescriptor, GrenadeEvent event )
 {
-	short userid, entityID;
-	float x, y, z;
-	player_info_t* planter;
+	int userid = -1;
+	int entityID = -1;
+	float x, y, z = -1;
+	player_info_t* planter = NULL;
 
 	if ( event != MOLOTOV_START && event != MOLOTOV_EXPIRE && event != MOLOTOV_EXTINGUISH )
 	{
@@ -1823,10 +1833,10 @@ void CDemoFileDump::HandleGrenadeEvent( const CSVCMsg_GameEvent &msg, const CSVC
 
 		//Remove from array
 		case DECOY_DETONATE:
-			{
-				printf( "	----- Decoy detonated at %f, %f, %f. Thrown by %s ------\n", x, y, z, planter->name );
-			}
-			break;
+		{
+			printf( "	----- Decoy detonated at %f, %f, %f. Thrown by %s ------\n", x, y, z, planter->name );
+		}
+		break;
 
 		default:
 			break;
@@ -1837,14 +1847,9 @@ void CDemoFileDump::HandleGrenadeEvent( const CSVCMsg_GameEvent &msg, const CSVC
 
 void CDemoFileDump::HandleWeaponFire( const CSVCMsg_GameEvent &msg, const CSVCMsg_GameEventList::descriptor_t *pDescriptor )
 {
-	short userid;
-	const char *weapon;	
-	player_info_t* player;
-
-	userid = msg.keys( 0 ).val_short();
-	weapon = msg.keys( 1 ).val_string().c_str();
-
-	player = FindPlayerInfo( userid );
+	int userid = msg.keys( 0 ).val_short();
+	const char *weapon = msg.keys( 1 ).val_string().c_str();
+	player_info_t *player = FindPlayerInfo( userid );
 
 	printf( "	----- %s fired weapon %s. -----\n", player->name, weapon );
 
@@ -1860,52 +1865,120 @@ void CDemoFileDump::HandleWeaponFire( const CSVCMsg_GameEvent &msg, const CSVCMs
 	//TODO add weapon fire event to event array
 }
 
-void CDemoFileDump::HandlePlayerDeath( const CSVCMsg_GameEvent &msg, const CSVCMsg_GameEventList::descriptor_t *pDescriptor )
+void CDemoFileDump::HandlePlayerBlind( const CSVCMsg_GameEvent &msg, const CSVCMsg_GameEventList::descriptor_t *pDescriptor )
 {
-	int numKeys = msg.keys().size();
+	int userid = msg.keys( 0 ).val_short();
+	player_info_t* player = FindPlayerInfo( userid );
 
-	int userid = -1;
-	int attackerid = -1;
-	int assisterid = 0;
-	const char *pWeaponName = NULL;
-	bool bHeadshot = false;
-	for ( int i = 0; i < numKeys; i++ )
+	int attackerid = msg.keys( 1 ).val_short();
+	player_info_t* attacker = FindPlayerInfo( attackerid );
+
+	//Can tick up number of people flashed by this entityID
+	int entityID = msg.keys( 2 ).val_short();
+	float blindDuration = msg.keys( 3 ).val_float();
+
+	//Sometimes finds gotv by accident??
+	if ( player && attacker )
 	{
-		const CSVCMsg_GameEventList::key_t& Key = pDescriptor->keys( i );
-		const CSVCMsg_GameEvent::key_t& KeyValue = msg.keys( i );
-
-		if ( Key.name().compare( "userid" ) == 0 )
-		{
-			userid = KeyValue.val_short();
-		}
-		else if ( Key.name().compare( "attacker" ) == 0 )
-		{
-			attackerid = KeyValue.val_short();
-		}
-		else if ( Key.name().compare( "assister" ) == 0 )
-		{
-			assisterid = KeyValue.val_short();
-		}
-		else if ( Key.name().compare( "weapon" ) == 0 )
-		{
-			pWeaponName = KeyValue.val_string().c_str();
-		}
-		else if ( Key.name().compare( "headshot" ) == 0 )
-		{
-			bHeadshot = KeyValue.val_bool();
-		}
+		printf( "	----- Player %s flashed by %s for %f seconds. -----\n", player->name, attacker->name, blindDuration );
 	}
 	
-	ShowPlayerInfo( "victim", userid, true, true );
-	printf ( ", " );
-	ShowPlayerInfo( "attacker", attackerid, true, true );
-	printf( ", %s, %s", pWeaponName, bHeadshot ? "true" : "false" );
-	if ( assisterid != 0 )
+	//TODO add to event array
+}
+
+void CDemoFileDump::HandlePlayerHurt( const CSVCMsg_GameEvent &msg, const CSVCMsg_GameEventList::descriptor_t *pDescriptor )
+{
+	int userid = msg.keys( 0 ).val_short();
+	player_info_t* player = FindPlayerInfo( userid );
+
+	int attackerid = msg.keys( 1 ).val_short();
+	player_info_t* attacker = FindPlayerInfo( attackerid );
+
+	int health = msg.keys( 2 ).val_byte();
+	int armour = msg.keys( 3 ).val_byte();
+	const char* weapon = msg.keys( 4 ).val_string().c_str();
+	int healthDamage = msg.keys( 5 ).val_short();
+	int armourDamage = msg.keys( 6 ).val_byte();
+	int hitgroup = msg.keys( 7 ).val_byte();
+
+	if ( attacker )
 	{
-		printf ( ", " );
-		ShowPlayerInfo( "assister", assisterid, true, true );
+		printf( "	----- Player %s hurt for %d damage (%d armour) by %s (weapon: %s, hitgroup: %d). -----\n", player->name, healthDamage, armourDamage, attacker->name, weapon, hitgroup );
 	}
-	printf( "\n" );
+	else
+	{
+		printf( "	----- Player %s hurt for %d damage (%d armour) by world. -----\n", player->name, healthDamage, armourDamage );
+	}
+	printf( "		Remaining health: %d, remaining armour: %d\n", health, armour );
+
+	//TODO add to event array/player state
+}
+
+void CDemoFileDump::HandlePlayerDeath( const CSVCMsg_GameEvent &msg, const CSVCMsg_GameEventList::descriptor_t *pDescriptor )
+{
+	int userid = msg.keys( 0 ).val_short();
+	player_info_t* player = FindPlayerInfo( userid );
+
+	int attackerid = msg.keys( 1 ).val_short();
+	player_info_t* attacker = FindPlayerInfo( attackerid );
+
+	int assisterid = msg.keys( 2 ).val_short();
+	player_info_t* assister = FindPlayerInfo( assisterid );
+
+	bool assistedFlash = msg.keys( 3 ).val_bool();
+	const char *weaponName = msg.keys( 4 ).val_string().c_str();
+	bool headshot = msg.keys( 8 ).val_bool();
+	bool wallbang = msg.keys( 12 ).val_bool();
+	bool throughSmoke = msg.keys( 15 ).val_bool();
+	bool whileBlind = msg.keys( 16 ).val_bool();
+	float distance = msg.keys( 17 ).val_float();
+
+	if ( player )
+	{
+		if ( attacker )
+		{
+			if ( assister )
+			{
+				printf( "	----- Player %s died to %s (Assist: %s). -----\n", player->name, attacker->name, assister->name );
+			}
+			else
+			{
+				printf( "	----- Player %s died to %s. -----\n", player->name, attacker->name );			
+			}
+		}
+		else
+		{
+			printf( "	----- Player %s died. -----\n", player->name );
+		}
+		printf( "		Weapon: %s \n", weaponName );
+
+		if ( assistedFlash )
+		{		
+			printf( "		Assisted flash \n" );
+		}
+		if ( headshot )
+		{
+			printf( "		Headshot \n");
+		}
+		if ( wallbang )
+		{
+			printf( "		Wallbang \n");
+		}
+		if ( throughSmoke )
+		{
+			printf( "		Through smoke \n");
+		}
+		if ( whileBlind )
+		{
+			printf( "		While blind \n");
+		}
+	}
+	else
+	{
+		printf( "	----- Player %d died to disconnection. -----\n", userid );
+	}
+
+	//TODO add to event array	
 }
 
 
@@ -2036,15 +2109,19 @@ void CDemoFileDump::ParseGameEvent( const CSVCMsg_GameEvent &msg, const CSVCMsg_
 				HandleGrenadeEvent( msg, pDescriptor, DECOY_DETONATE );
 			}
 
-			//player_team, player_death, player_hurt, weapon_fire,
-
 			//Handling player game events
 			else if ( gameEvent.compare( "weapon_fire" ) == 0 )
 			{
 				HandleWeaponFire( msg, pDescriptor );
 			}
-
-
+			else if ( gameEvent.compare( "player_blind" ) == 0 )
+			{
+				HandlePlayerBlind( msg, pDescriptor );
+			}
+			else if ( gameEvent.compare( "player_hurt" ) == 0 )
+			{
+				HandlePlayerHurt( msg, pDescriptor );
+			}
 			else if ( gameEvent.compare( "player_death" ) == 0 )
 			{
 				HandlePlayerDeath( msg, pDescriptor );

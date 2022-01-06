@@ -250,6 +250,8 @@ private:
 	void HandleBombEvent( const CSVCMsg_GameEvent &msg, const CSVCMsg_GameEventList::descriptor_t *pDescriptor, BombEvent event );
 	void HandleGrenadeEvent( const CSVCMsg_GameEvent &msg, const CSVCMsg_GameEventList::descriptor_t *pDescriptor, GrenadeEvent event );
 	void HandleWeaponFire( const CSVCMsg_GameEvent &msg, const CSVCMsg_GameEventList::descriptor_t *pDescriptor );
+	void HandlePlayerBlind( const CSVCMsg_GameEvent &msg, const CSVCMsg_GameEventList::descriptor_t *pDescriptor );
+	void HandlePlayerHurt( const CSVCMsg_GameEvent &msg, const CSVCMsg_GameEventList::descriptor_t *pDescriptor );
 	void HandlePlayerDeath( const CSVCMsg_GameEvent &msg, const CSVCMsg_GameEventList::descriptor_t *pDescriptor );
 
 	void DisplayPlayerInfo();

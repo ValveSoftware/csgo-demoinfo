@@ -22,4 +22,10 @@ typedef enum
 }
 GrenadeEvent;
 
+typedef enum
+{
+	PLAYER_TEAM
+}
+PlayerEvent;
+
 #endif

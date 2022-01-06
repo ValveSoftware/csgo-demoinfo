@@ -1,7 +1,7 @@
 parsed by ParseGameEvents()
 
 //  begin_new_match, round_start, round_freeze_end, round_end, round_officially_ended, 
-//    player_team, player_spawn, player_death, player_hurt, weapon_fire,    player_blind, item_equip, item_remove
+//    player_death, player_hurt, weapon_fire,    player_team, player_spawn, player_blind, item_equip, item_remove
 //    smokegrenade_detonate, smokegrenade_expired, flashbang_detonate, hegrenade_detonate, molotov_detonate, inferno_startburn, inferno_expire, inferno_extinguish, decoy_started, decoy_firing, decoy_detonate, 
 //    bomb_beginplant, bomb_abortplant, bomb_planted, bomb_begin_defuse, bomb_abort_defuse, bomb_defused, bomb_exploded, bomb_pickup, bomb_dropped
 
