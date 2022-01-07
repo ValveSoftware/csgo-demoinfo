@@ -123,6 +123,7 @@ protoc-2.5.0-win32\protoc.exe --proto_path=.\protobuf-2.5.0\src --proto_path=. -
     <ClCompile Include="demofilepropdecode.cpp" />
     <ClCompile Include="generated_proto\cstrike15_usermessages_public.pb.cc" />
     <ClCompile Include="generated_proto\netmessages_public.pb.cc" />
+    <ClCompile Include="player.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="demofile.h" />
@@ -132,6 +133,7 @@ protoc-2.5.0-win32\protoc.exe --proto_path=.\protobuf-2.5.0\src --proto_path=. -
     <ClInclude Include="enums.h" />
     <ClInclude Include="generated_proto\cstrike15_usermessages_public.pb.h" />
     <ClInclude Include="generated_proto\netmessages_public.pb.h" />
+    <ClInclude Include="player.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

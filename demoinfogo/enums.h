@@ -24,8 +24,8 @@ GrenadeEvent;
 
 typedef enum
 {
-	PLAYER_TEAM
+	PLAYER_DEFAULT, PLAYER_PLANTING, PLAYER_DEFUSING, PLAYER_FIRING
 }
-PlayerEvent;
+PlayerStatus;
 
 #endif

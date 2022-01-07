@@ -23,6 +23,8 @@
 //===========================================================================//
 
 #include <stdarg.h>
+#include <iostream>
+#include <string>  
 #include <conio.h>
 #include "demofile.h"
 #include "demofiledump.h"
@@ -46,6 +48,7 @@ static std::vector< CSVCMsg_SendTable > s_DataTables;
 static std::vector< ExcludeEntry > s_currentExcludes;
 static std::vector< EntityEntry * > s_Entities;
 static std::vector< player_info_t > s_PlayerInfos;
+static std::vector< Player* > s_PlayerInstances;
 
 extern bool g_bDumpGameEvents;
 extern bool g_bSupressFootstepEvents;
@@ -92,6 +95,15 @@ bool CDemoFileDump::Open( const char *filename )
 
 /************************Helper Functions************************/
 
+void CDemoFileDump::CleanUp()
+{
+	for( int i = 0; i < s_PlayerInstances.size(); i++ )
+	{
+		delete s_PlayerInstances.at( i );
+	}
+	s_PlayerInstances.clear();
+}
+
 template< typename T >
 static void LowLevelByteSwap( T *output, const T *input )
 {
@@ -101,6 +113,30 @@ static void LowLevelByteSwap( T *output, const T *input )
 		( ( unsigned char* )&temp )[i] = ( ( unsigned char* )input )[ sizeof( T ) - ( i + 1 ) ]; 
 	}
 	memcpy( output, &temp, sizeof( T ) );
+}
+
+Player *CDemoFileDump::FindPlayerInstance( int userID )
+{
+	for ( int i = 0; i < s_PlayerInstances.size(); i++ )
+	{
+		if ( s_PlayerInstances.at( i )->userID == userID )
+		{
+			return s_PlayerInstances.at( i );
+		}
+	}
+	return NULL;
+}
+
+Player *CDemoFileDump::FindPlayerInstanceByGUID( int GUID )
+{
+	for ( int i = 0; i < s_PlayerInstances.size(); i++ )
+	{
+		if ( s_PlayerInstances.at(i)->GetGUID() == GUID )
+		{
+			return s_PlayerInstances.at( i );
+		}
+	}
+	return NULL;
 }
 
 player_info_t *FindPlayerByEntity( int entityId )
@@ -1486,73 +1522,78 @@ bool CDemoFileDump::ShowPlayerInfo( const char *pField, int nIndex, bool bShowDe
 
 void CDemoFileDump::DisplayPlayerInfo()
 {
-	player_info_t *pPlayerInfo;
 	EntityEntry *pEntity;
-	printf( "Player positions: \n" );
-	for( int i = 0; i < s_PlayerInfos.size(); i++ )
+	Player *pPlayer;
+	for( int i = 0; i < s_PlayerInstances.size(); i++ )
 	{
-		printf( " %s (id:%d)\n", s_PlayerInfos.at( i ).name, s_PlayerInfos.at(i).userID );
-		pEntity = FindEntity( s_PlayerInfos.at( i ).entityID + 1 );
-		if( pEntity )
-		{
-			//Getting xyz coordindates
+		pPlayer = s_PlayerInstances.at( i );
+		pEntity = FindEntity( pPlayer->entityID + 1 );
+		//pPlayer = FindPlayerInstance( s_PlayerInfos.at( i ).userID );
+		if( pEntity && pPlayer )
+		{	
+			//Getting name
+			//pPlayer->name = s_PlayerInfos.at( i ).name;
+
+			//Getting team
+			PropEntry *pTeam = pEntity->FindProp( "m_iTeamNum" );
+			if( pTeam ){
+				pPlayer->teamID = pTeam->m_pPropValue->m_value.m_int;
+			}
+
+			//Getting xyz coordinates
 			PropEntry *pXYProp = pEntity->FindProp( "m_vecOrigin" );
 			PropEntry *pZProp = pEntity->FindProp( "m_vecOrigin[2]" );
 			if ( pXYProp && pZProp )
 			{
-				printf( "  position: %f, %f, %f\n", pXYProp->m_pPropValue->m_value.m_vector.x, pXYProp->m_pPropValue->m_value.m_vector.y, pZProp->m_pPropValue->m_value.m_float );
+				pPlayer->x = pXYProp->m_pPropValue->m_value.m_vector.x;
+				pPlayer->y = pXYProp->m_pPropValue->m_value.m_vector.y;
+				pPlayer->z = pZProp->m_pPropValue->m_value.m_float;
 			}
 			//Getting aim coordinates
 			PropEntry *pAngle0Prop = pEntity->FindProp( "m_angEyeAngles[0]" );
 			PropEntry *pAngle1Prop = pEntity->FindProp( "m_angEyeAngles[1]" );
 			if ( pAngle0Prop && pAngle1Prop )
 			{
-				printf( "  facing: pitch:%f, yaw:%f\n", pAngle0Prop->m_pPropValue->m_value.m_float, pAngle1Prop->m_pPropValue->m_value.m_float );
+				pPlayer->eyePitch = pAngle0Prop->m_pPropValue->m_value.m_float;
+				pPlayer->eyeYaw = pAngle1Prop->m_pPropValue->m_value.m_float;
 			}
-			//Getting health and armour
+			//Getting health, armour, kit
 			PropEntry *pHealth = pEntity->FindProp( "m_iHealth" );
 			PropEntry *pArmour = pEntity->FindProp( "m_ArmorValue" );
 			PropEntry *pHelmet = pEntity->FindProp( "m_bHasHelmet" );
-			if( pHealth && pArmour )
+			PropEntry* pDefuser = pEntity->FindProp("m_bHasDefuser");
+			if ( pHealth && pArmour )
 			{
-				if( pHelmet && pHelmet->m_pPropValue->m_value.m_int == 1 )
+				pPlayer->health = pHealth->m_pPropValue->m_value.m_int;
+				pPlayer->armour = pArmour->m_pPropValue->m_value.m_int;
+				if ( pHelmet )
 				{
-					printf( "  health: %d, armour: %d, helmet\n", pHealth->m_pPropValue->m_value.m_int, pArmour->m_pPropValue->m_value.m_int );
+					pPlayer->hasHelmet = ( pHelmet->m_pPropValue->m_value.m_int == 1 ) ? true : false;
 				}
-				else 
+				if ( pDefuser )
 				{
-					printf( "  health: %d, armour: %d, no helmet\n", pHealth->m_pPropValue->m_value.m_int, pArmour->m_pPropValue->m_value.m_int );
+					pPlayer->hasDefuseKit = ( pDefuser->m_pPropValue->m_value.m_int == 1 ) ? true : false;
 				}
 			}
-			else{
-				printf( "  couldn't find health info\n");
-			}
-			//Getting defuse kit
-			PropEntry *pDefuser = pEntity->FindProp( "m_bHasDefuser" );
-			if( pDefuser && pDefuser->m_pPropValue->m_value.m_int == 1 ){
-				printf( "  has kit\n");
-			}
-			//Getting active weapon and total equipment value
-			PropEntry *pActiveWeapon = pEntity->FindProp( "m_hActiveWeapon" );
+
+			//Getting money			
 			PropEntry *pMoney = pEntity->FindProp( "m_iAccount" );
-			if( pActiveWeapon && pMoney )
+			if( pMoney )
 			{
-				printf( "  active weapon: s, money: %d\n", pMoney->m_pPropValue->m_value.m_int );
-				pActiveWeapon->m_pPropValue->Print();
+				pPlayer->money = pMoney->m_pPropValue->m_value.m_int;
 			}
+
 			//Getting flashed state
 			//Only gives the initial duration - doesn't decay with time
 			//Just check if duration > 0, indicating player is flashed
 			PropEntry *pFlash = pEntity->FindProp( "m_flFlashDuration" );
 			if( pFlash ){
-				printf( "  flashed: %f\n", pFlash->m_pPropValue->m_value.m_float );
+				pPlayer->flashDuration = pFlash->m_pPropValue->m_value.m_float;
 			}
 
-			//Getting team
-			PropEntry *pTeam = pEntity->FindProp( "m_iTeamNum" );
-			if( pTeam ){
-				printf( "  team: %d\n", pTeam->m_pPropValue->m_value.m_int );
-			}
+			//TODO
+			//Getting active weapon and total equipment value
+			//PropEntry *pActiveWeapon = pEntity->FindProp( "m_hActiveWeapon" );
 		}
 	}	
 }
@@ -1568,8 +1609,10 @@ void CDemoFileDump::HandlePlayerConnection( const CSVCMsg_GameEvent &msg, const 
 	int userid = -1;
 	unsigned int index = -1;
 	const char *name = NULL;
+	std::string goodname;
 	bool bBot = false;
 	const char *reason = NULL;
+	int GUID = -1;
 	for ( int i = 0; i < numKeys; i++ )
 	{
 		const CSVCMsg_GameEventList::key_t& Key = pDescriptor->keys( i );
@@ -1585,10 +1628,23 @@ void CDemoFileDump::HandlePlayerConnection( const CSVCMsg_GameEvent &msg, const 
 		else if ( Key.name().compare( "name" ) == 0 )
 		{
 			name = KeyValue.val_string().c_str();
+			goodname = KeyValue.val_string();
+			printf("%s\n", goodname.c_str());
 		}
+		//This is the GUID
 		else if ( Key.name().compare( "networkid" ) == 0 )
 		{
 			bBot = ( KeyValue.val_string().compare( "BOT" ) == 0 );
+			const char* GUIDString = KeyValue.val_string().c_str();
+			if ( !bBot )
+			{
+				//TODO Probably error check this
+				GUID = std::stoi( GUIDString + 10 );
+			}
+			else
+			{
+				//TODO make GUIDs for bots
+			}
 		}
 		else if ( Key.name().compare( "bot" ) == 0 )
 		{
@@ -1602,6 +1658,25 @@ void CDemoFileDump::HandlePlayerConnection( const CSVCMsg_GameEvent &msg, const 
 
 	if ( connection )
 	{
+		//New player connecting
+		if ( !FindPlayerInstanceByGUID( GUID ) )
+		{			
+			printf("	Player %d %s (id:%d) connected. EntityID: %d \n", GUID, goodname.c_str(), userid, index + 1);
+			s_PlayerInstances.push_back( new Player( GUID, index, userid, name, bBot ) );
+		}
+		//Existing playing reconnected
+		else
+		{			
+			printf("	Player %d %s (id:%d) reconnected. EntityID: %d \n", GUID, goodname.c_str(), userid, index + 1);
+			//FindPlayerInstanceByGUID( GUID )->name = name;
+			FindPlayerInstanceByGUID( GUID )->userID = userid;
+			FindPlayerInstanceByGUID( GUID )->entityID = index;
+			FindPlayerInstanceByGUID( GUID )->SetIsConnected( true );
+		}
+
+
+
+
 		player_info_t newPlayer;
 		memset( &newPlayer, 0, sizeof(newPlayer) );
 		newPlayer.userID = userid;
@@ -1613,25 +1688,29 @@ void CDemoFileDump::HandlePlayerConnection( const CSVCMsg_GameEvent &msg, const 
 		}
 		
 		newPlayer.entityID = index;
-		auto existing = FindPlayerByEntity(index);
+		auto existing = FindPlayerByEntity( index );
 		
 		// add entity if it doesn't exist, update if it does
-		if(!existing) {
+		if (!existing) {
 			printf("	Player %s %s (id:%d) connected. EntityID: %d \n", newPlayer.guid, name, userid, newPlayer.entityID + 1);
 			s_PlayerInfos.push_back(newPlayer);
 		}
 		else {
 			*existing = newPlayer;
+			printf("	Player %s %s (id:%d) reconnected. EntityID: %d \n", newPlayer.guid, name, userid, newPlayer.entityID + 1);
 		}	
 	}
 	else
 	{
+		//TODO careful how this handles bots
+		FindPlayerInstanceByGUID( GUID )->SetIsConnected( false );
+
 		printf( "	Player %s (id:%d) disconnected. reason: %s\n", name, userid, reason );		
 		// mark the player info slot as disconnected
 		player_info_t *pPlayerInfo = FindPlayerInfo( userid );
-		if (pPlayerInfo)
+		if ( pPlayerInfo )
 		{
-			strcpy_s( pPlayerInfo->name, "disconnected" );
+			//strcpy_s( pPlayerInfo->name, "disconnected" );
 			pPlayerInfo->userID = -1;
 			pPlayerInfo->guid[ 0 ] = 0;
 		}
@@ -1644,7 +1723,7 @@ void CDemoFileDump::HandleBombEvent( const CSVCMsg_GameEvent &msg, const CSVCMsg
 	int userid = msg.keys( 0 ).val_short();
 	int bombsite = -1;
 	char* action = NULL;
-	player_info_t* planter = FindPlayerInfo( userid );
+	Player* planter = FindPlayerInstance( userid );
 	EntityEntry *pEntity = FindEntity( planter->entityID + 1 );
 
 	if ( event != B_PICK_UP && event != B_DROP )
@@ -1750,7 +1829,7 @@ void CDemoFileDump::HandleGrenadeEvent( const CSVCMsg_GameEvent &msg, const CSVC
 	int userid = -1;
 	int entityID = -1;
 	float x, y, z = -1;
-	player_info_t* planter = NULL;
+	Player* planter = NULL;
 
 	if ( event != MOLOTOV_START && event != MOLOTOV_EXPIRE && event != MOLOTOV_EXTINGUISH )
 	{
@@ -1759,7 +1838,7 @@ void CDemoFileDump::HandleGrenadeEvent( const CSVCMsg_GameEvent &msg, const CSVC
 		x = msg.keys( 2 ).val_float();
 		y = msg.keys( 3 ).val_float();
 		z = msg.keys( 4 ).val_float();
-		planter = FindPlayerInfo( userid );
+		planter = FindPlayerInstance( userid );
 	}
 	else{
 		entityID = msg.keys( 0 ).val_short();
@@ -1849,7 +1928,7 @@ void CDemoFileDump::HandleWeaponFire( const CSVCMsg_GameEvent &msg, const CSVCMs
 {
 	int userid = msg.keys( 0 ).val_short();
 	const char *weapon = msg.keys( 1 ).val_string().c_str();
-	player_info_t *player = FindPlayerInfo( userid );
+	Player* player = FindPlayerInstance( userid );
 
 	printf( "	----- %s fired weapon %s. -----\n", player->name, weapon );
 
@@ -1868,10 +1947,10 @@ void CDemoFileDump::HandleWeaponFire( const CSVCMsg_GameEvent &msg, const CSVCMs
 void CDemoFileDump::HandlePlayerBlind( const CSVCMsg_GameEvent &msg, const CSVCMsg_GameEventList::descriptor_t *pDescriptor )
 {
 	int userid = msg.keys( 0 ).val_short();
-	player_info_t* player = FindPlayerInfo( userid );
+	Player* player = FindPlayerInstance( userid );
 
 	int attackerid = msg.keys( 1 ).val_short();
-	player_info_t* attacker = FindPlayerInfo( attackerid );
+	Player* attacker = FindPlayerInstance( attackerid );
 
 	//Can tick up number of people flashed by this entityID
 	int entityID = msg.keys( 2 ).val_short();
@@ -1889,10 +1968,10 @@ void CDemoFileDump::HandlePlayerBlind( const CSVCMsg_GameEvent &msg, const CSVCM
 void CDemoFileDump::HandlePlayerHurt( const CSVCMsg_GameEvent &msg, const CSVCMsg_GameEventList::descriptor_t *pDescriptor )
 {
 	int userid = msg.keys( 0 ).val_short();
-	player_info_t* player = FindPlayerInfo( userid );
+	Player* player = FindPlayerInstance( userid );
 
 	int attackerid = msg.keys( 1 ).val_short();
-	player_info_t* attacker = FindPlayerInfo( attackerid );
+	Player* attacker = FindPlayerInstance( attackerid );
 
 	int health = msg.keys( 2 ).val_byte();
 	int armour = msg.keys( 3 ).val_byte();
@@ -1917,13 +1996,13 @@ void CDemoFileDump::HandlePlayerHurt( const CSVCMsg_GameEvent &msg, const CSVCMs
 void CDemoFileDump::HandlePlayerDeath( const CSVCMsg_GameEvent &msg, const CSVCMsg_GameEventList::descriptor_t *pDescriptor )
 {
 	int userid = msg.keys( 0 ).val_short();
-	player_info_t* player = FindPlayerInfo( userid );
+	Player* player = FindPlayerInstance( userid );
 
-	int attackerid = msg.keys( 1 ).val_short();
-	player_info_t* attacker = FindPlayerInfo( attackerid );
+	int attackerid = msg.keys( 1 ).val_short();	
+	Player* attacker = FindPlayerInstance( attackerid );
 
-	int assisterid = msg.keys( 2 ).val_short();
-	player_info_t* assister = FindPlayerInfo( assisterid );
+	int assisterid = msg.keys( 2 ).val_short();	
+	Player* assister = FindPlayerInstance( assisterid );
 
 	bool assistedFlash = msg.keys( 3 ).val_bool();
 	const char *weaponName = msg.keys( 4 ).val_string().c_str();
@@ -2194,6 +2273,7 @@ void CDemoFileDump::ParseToEnd()
 	{
 
 	}
+	CleanUp();
 }
 
 bool CDemoFileDump::ParseNextTick()
@@ -2202,6 +2282,16 @@ bool CDemoFileDump::ParseNextTick()
 	if ( s_bMatchStartOccured )
 	{
 		DisplayPlayerInfo();
+
+		printf( "Player positions: \n" );
+		for( int i = 0; i < s_PlayerInstances.size(); i++ )
+		{
+			
+			if ( s_PlayerInstances.at( i )->GetIsConnected() )
+			{				
+				s_PlayerInstances.at( i )->Print();
+			}
+		}
 	}
 
 	return b;

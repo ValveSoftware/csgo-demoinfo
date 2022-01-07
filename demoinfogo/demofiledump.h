@@ -28,6 +28,7 @@
 #include "demofile.h"
 #include "demofilebitbuf.h"
 #include "demofilepropdecode.h"
+#include "player.h"
 #include "enums.h"
 
 #include "generated_proto/netmessages_public.pb.h"
@@ -90,6 +91,8 @@ struct player_info_t
 	unsigned char	filesDownloaded;
 	// entity index
 	int				entityID;
+
+	int 			internalID;
 };
 
 struct ExcludeEntry
@@ -246,6 +249,9 @@ public:
 	int m_nFrameNumber;
 
 private:
+	void CleanUp();
+	Player *FindPlayerInstance( int internalID );
+	Player *FindPlayerInstanceByGUID( int GUID );
 	void HandlePlayerConnection( const CSVCMsg_GameEvent &msg, const CSVCMsg_GameEventList::descriptor_t *pDescriptor, bool connection );
 	void HandleBombEvent( const CSVCMsg_GameEvent &msg, const CSVCMsg_GameEventList::descriptor_t *pDescriptor, BombEvent event );
 	void HandleGrenadeEvent( const CSVCMsg_GameEvent &msg, const CSVCMsg_GameEventList::descriptor_t *pDescriptor, GrenadeEvent event );
