@@ -63,6 +63,7 @@ extern bool g_bDumpNetMessages;
 static bool s_bMatchStartOccured = false;
 static int s_nCurrentRound = 1;
 static int s_nCurrentTick = 0;
+static int s_nBots = 0;
 static RoundStatus s_RoundStatus;
 
 player_info_t *FindPlayerByEntity(int entityID);
@@ -97,9 +98,9 @@ bool CDemoFileDump::Open( const char *filename )
 
 void CDemoFileDump::CleanUp()
 {
-	for( int i = 0; i < s_PlayerInstances.size(); i++ )
-	{
-		delete s_PlayerInstances.at( i );
+	for ( std::vector< Player* >::iterator it = s_PlayerInstances.begin(); it != s_PlayerInstances.end(); ++it )
+	{			
+		delete *it;
 	}
 	s_PlayerInstances.clear();
 }
@@ -117,11 +118,11 @@ static void LowLevelByteSwap( T *output, const T *input )
 
 Player *CDemoFileDump::FindPlayerInstance( int userID )
 {
-	for ( int i = 0; i < s_PlayerInstances.size(); i++ )
-	{
-		if ( s_PlayerInstances.at( i )->userID == userID )
-		{
-			return s_PlayerInstances.at( i );
+	for ( std::vector< Player* >::iterator it = s_PlayerInstances.begin(); it != s_PlayerInstances.end(); ++it )
+	{			
+		if ( ( *it )->GetUserID() == userID )
+		{				
+			return *it;
 		}
 	}
 	return NULL;
@@ -129,11 +130,11 @@ Player *CDemoFileDump::FindPlayerInstance( int userID )
 
 Player *CDemoFileDump::FindPlayerInstanceByGUID( int GUID )
 {
-	for ( int i = 0; i < s_PlayerInstances.size(); i++ )
-	{
-		if ( s_PlayerInstances.at(i)->GetGUID() == GUID )
-		{
-			return s_PlayerInstances.at( i );
+	for ( std::vector< Player* >::iterator it = s_PlayerInstances.begin(); it != s_PlayerInstances.end(); ++it )
+	{			
+		if ( ( *it )->GetGUID() == GUID )
+		{				
+			return *it;
 		}
 	}
 	return NULL;
@@ -877,6 +878,7 @@ bool DumpStringTable( CBitRead &buf, bool bIsUserInfo )
 
 			if( bIsUserInfo && data != NULL )
 			{
+				/*
 				const player_info_t *pUnswappedPlayerInfo = ( const player_info_t * )data;
 				player_info_t playerInfo = *pUnswappedPlayerInfo;
 				playerInfo.entityID = i;
@@ -900,7 +902,7 @@ bool DumpStringTable( CBitRead &buf, bool bIsUserInfo )
 				else 
 				{
 					*existing = playerInfo;
-				}
+				}*/
 			}
 			else
 			{
@@ -1524,16 +1526,14 @@ void CDemoFileDump::DisplayPlayerInfo()
 {
 	EntityEntry *pEntity;
 	Player *pPlayer;
-	for( int i = 0; i < s_PlayerInstances.size(); i++ )
+
+	for ( std::vector< Player* >::iterator it = s_PlayerInstances.begin(); it != s_PlayerInstances.end(); ++it )
 	{
-		pPlayer = s_PlayerInstances.at( i );
+		pPlayer = *it;
 		pEntity = FindEntity( pPlayer->entityID + 1 );
-		//pPlayer = FindPlayerInstance( s_PlayerInfos.at( i ).userID );
+
 		if( pEntity && pPlayer )
 		{	
-			//Getting name
-			//pPlayer->name = s_PlayerInfos.at( i ).name;
-
 			//Getting team
 			PropEntry *pTeam = pEntity->FindProp( "m_iTeamNum" );
 			if( pTeam ){
@@ -1595,7 +1595,17 @@ void CDemoFileDump::DisplayPlayerInfo()
 			//Getting active weapon and total equipment value
 			//PropEntry *pActiveWeapon = pEntity->FindProp( "m_hActiveWeapon" );
 		}
-	}	
+	}
+
+	printf( "Player positions: \n" );
+	for ( std::vector< Player* >::iterator it = s_PlayerInstances.begin(); it != s_PlayerInstances.end(); ++it )
+	{			
+		if ( ( *it )->GetIsConnected() )
+		{				
+			//( *it )->Print();
+		}
+		( *it )->Print();
+	}
 }
 
 
@@ -1609,7 +1619,6 @@ void CDemoFileDump::HandlePlayerConnection( const CSVCMsg_GameEvent &msg, const 
 	int userid = -1;
 	unsigned int index = -1;
 	const char *name = NULL;
-	std::string goodname;
 	bool bBot = false;
 	const char *reason = NULL;
 	int GUID = -1;
@@ -1628,8 +1637,6 @@ void CDemoFileDump::HandlePlayerConnection( const CSVCMsg_GameEvent &msg, const 
 		else if ( Key.name().compare( "name" ) == 0 )
 		{
 			name = KeyValue.val_string().c_str();
-			goodname = KeyValue.val_string();
-			printf("%s\n", goodname.c_str());
 		}
 		//This is the GUID
 		else if ( Key.name().compare( "networkid" ) == 0 )
@@ -1640,10 +1647,6 @@ void CDemoFileDump::HandlePlayerConnection( const CSVCMsg_GameEvent &msg, const 
 			{
 				//TODO Probably error check this
 				GUID = std::stoi( GUIDString + 10 );
-			}
-			else
-			{
-				//TODO make GUIDs for bots
 			}
 		}
 		else if ( Key.name().compare( "bot" ) == 0 )
@@ -1658,26 +1661,60 @@ void CDemoFileDump::HandlePlayerConnection( const CSVCMsg_GameEvent &msg, const 
 
 	if ( connection )
 	{
-		//New player connecting
-		if ( !FindPlayerInstanceByGUID( GUID ) )
-		{			
-			printf("	Player %d %s (id:%d) connected. EntityID: %d \n", GUID, goodname.c_str(), userid, index + 1);
-			s_PlayerInstances.push_back( new Player( GUID, index, userid, name, bBot ) );
+		if ( !bBot )
+		{
+			Player* connectingPlayer = FindPlayerInstanceByGUID( GUID );
+
+			//New player connecting
+			if ( !connectingPlayer )
+			{			
+				printf("	Player %d %s (id:%d) connected. EntityID: %d \n", GUID, name, userid, index + 1);
+				s_PlayerInstances.push_back( new Player( GUID, index, userid, name, bBot ) );
+			}
+			//Existing playing reconnected
+			else
+			{			
+				printf("	Player %d %s (id:%d) reconnected. EntityID: %d \n", GUID, name, userid, index + 1);
+				//Once a player reconnects they get a new userID and entityID? thanks volvo
+				connectingPlayer->userID = userid;
+				connectingPlayer->entityID = index;
+				connectingPlayer->SetIsConnected( true );
+			}
 		}
-		//Existing playing reconnected
 		else
-		{			
-			printf("	Player %d %s (id:%d) reconnected. EntityID: %d \n", GUID, goodname.c_str(), userid, index + 1);
-			//FindPlayerInstanceByGUID( GUID )->name = name;
-			FindPlayerInstanceByGUID( GUID )->userID = userid;
-			FindPlayerInstanceByGUID( GUID )->entityID = index;
-			FindPlayerInstanceByGUID( GUID )->SetIsConnected( true );
+		{
+			//Bots don't have a GUID, and userids/entity ids aren't static. We'll find (existing) bots by name
+			//Might make this a function
+			Player* connectingBot = NULL;
+
+			for ( std::vector< Player* >::iterator it = s_PlayerInstances.begin(); it != s_PlayerInstances.end(); ++it )
+			{			
+				if ( ( *it )->GetName().compare( name ) == 0 && ( *it )->GetIsBot() )
+				{				
+					connectingBot = *it;
+				}
+			}
+
+			if ( !connectingBot )
+			{				
+				//Gives bots a unique GUID for our own reference
+				GUID = -100 * ( ++s_nBots );
+				printf("	Bot %d %s (id:%d) connected. EntityID: %d \n", GUID, name, userid, index + 1);
+				s_PlayerInstances.push_back( new Player( GUID, index, userid, name, bBot ) );
+			}
+			else
+			{
+				//idk if a bot can reconnect but here it is
+				printf("	Bot %d %s (id:%d) reconnected. EntityID: %d \n", connectingBot->GetGUID(), name, userid, index + 1);
+				connectingBot->userID = userid;
+				connectingBot->entityID = index;
+				connectingBot->SetIsConnected( true );
+			}
 		}
 
 
 
-
-		player_info_t newPlayer;
+		/*player_info_t newPlayer;
 		memset( &newPlayer, 0, sizeof(newPlayer) );
 		newPlayer.userID = userid;
 		strcpy_s( newPlayer.name, name );
@@ -1698,14 +1735,44 @@ void CDemoFileDump::HandlePlayerConnection( const CSVCMsg_GameEvent &msg, const 
 		else {
 			*existing = newPlayer;
 			printf("	Player %s %s (id:%d) reconnected. EntityID: %d \n", newPlayer.guid, name, userid, newPlayer.entityID + 1);
-		}	
+		}*/	
 	}
 	else
 	{
-		//TODO careful how this handles bots
-		FindPlayerInstanceByGUID( GUID )->SetIsConnected( false );
+		if ( !bBot )
+		{
+			Player* disconnectingPlayer = FindPlayerInstanceByGUID( GUID );
+			//If this fails to find, we have a problem lmao
+			if ( disconnectingPlayer )
+			{
+				printf("	Player %d %s (id:%d) disconnected. EntityID: %d. Reason: %s\n", GUID, name, userid, disconnectingPlayer->entityID, reason);
+				disconnectingPlayer->SetIsConnected( false );
+				disconnectingPlayer->userID = -1;
+				disconnectingPlayer->entityID = -1;		
+			}
+		}
+		else
+		{			
+			Player* disconnectingBot = NULL;
 
-		printf( "	Player %s (id:%d) disconnected. reason: %s\n", name, userid, reason );		
+			//Bots don't have a GUID in the networked message, so we have to find it by name
+			for ( std::vector< Player* >::iterator it = s_PlayerInstances.begin(); it != s_PlayerInstances.end(); ++it )
+			{			
+				if ( ( *it )->GetName().compare( name ) == 0 && ( *it )->GetIsBot())
+				{				
+					disconnectingBot = *it;
+				}
+			}		
+			if ( disconnectingBot )
+			{
+				printf("	Bot %d %s (id:%d) disconnected. EntityID: %d. Reason: %s\n", disconnectingBot->GetGUID(), name, userid, disconnectingBot->entityID, reason);
+				disconnectingBot->SetIsConnected( false );
+				disconnectingBot->userID = -1;
+				disconnectingBot->entityID = -1;		
+			}
+		}
+
+		/*printf( "	Player %s (id:%d) disconnected. reason: %s\n", name, userid, reason );		
 		// mark the player info slot as disconnected
 		player_info_t *pPlayerInfo = FindPlayerInfo( userid );
 		if ( pPlayerInfo )
@@ -1713,7 +1780,7 @@ void CDemoFileDump::HandlePlayerConnection( const CSVCMsg_GameEvent &msg, const 
 			//strcpy_s( pPlayerInfo->name, "disconnected" );
 			pPlayerInfo->userID = -1;
 			pPlayerInfo->guid[ 0 ] = 0;
-		}
+		}*/
 	}
 }
 
@@ -1782,7 +1849,7 @@ void CDemoFileDump::HandleBombEvent( const CSVCMsg_GameEvent &msg, const CSVCMsg
 		case B_PICK_UP:
 			{
 				action = "picked up at";
-				printf( "	----- Bomb has been picked up by %s -----\n", planter->name );
+				printf( "	----- Bomb has been picked up by %s -----\n", planter->GetName().c_str() );
 			}
 			break;
 
@@ -1790,7 +1857,7 @@ void CDemoFileDump::HandleBombEvent( const CSVCMsg_GameEvent &msg, const CSVCMsg
 		case B_DROP:
 			{
 				action = "dropped at";
-				printf( "	----- Bomb has been dropped by %s -----\n", planter->name );
+				printf( "	----- Bomb has been dropped by %s -----\n", planter->GetName().c_str() );
 			}
 			break;
 
@@ -1813,7 +1880,7 @@ void CDemoFileDump::HandleBombEvent( const CSVCMsg_GameEvent &msg, const CSVCMsg
 		PropEntry* pZProp = pEntity->FindProp( "m_vecOrigin[2]" );
 		if ( pXYProp && pZProp )
 		{			
-			printf("  %s %s position: %f, %f, %f\n", planter->name, action, pXYProp->m_pPropValue->m_value.m_vector.x, pXYProp->m_pPropValue->m_value.m_vector.y, pZProp->m_pPropValue->m_value.m_float );
+			printf("  %s %s position: %f, %f, %f\n", planter->GetName().c_str(), action, pXYProp->m_pPropValue->m_value.m_vector.x, pXYProp->m_pPropValue->m_value.m_vector.y, pZProp->m_pPropValue->m_value.m_float );
 		}
 	}
 	//TODO
@@ -1873,47 +1940,47 @@ void CDemoFileDump::HandleGrenadeEvent( const CSVCMsg_GameEvent &msg, const CSVC
 		//Add to array
 		case SMOKE_DETONATE:
 			{
-				printf( "	----- Smoke detonated at %f, %f, %f. Thrown by %s ------\n", x, y, z, planter->name );		
+				printf( "	----- Smoke detonated at %f, %f, %f. Thrown by %s ------\n", x, y, z, planter->GetName().c_str() );		
 			}
 			break;
 
 		//Remove from array
 		case SMOKE_EXPIRED:
 			{
-				printf( "	----- Smoke expired at %f, %f, %f. Thrown by %s ------\n", x, y, z, planter->name );
+				printf( "	----- Smoke expired at %f, %f, %f. Thrown by %s ------\n", x, y, z, planter->GetName().c_str() );
 			}
 			break;
 
 		case FLASH_DETONATE:
 			{
-				printf( "	----- Flashbang detonated at %f, %f, %f. Thrown by %s ------\n", x, y, z, planter->name );	
+				printf( "	----- Flashbang detonated at %f, %f, %f. Thrown by %s ------\n", x, y, z, planter->GetName().c_str() );	
 			}
 			break;
 
 		case HE_DETONATE:
 			{
-				printf( "	----- HE detonated at %f, %f, %f. Thrown by %s ------\n", x, y, z, planter->name );
+				printf( "	----- HE detonated at %f, %f, %f. Thrown by %s ------\n", x, y, z, planter->GetName().c_str() );
 			}
 			break;
 
 		//Add to remove
 		case DECOY_START:
 			{
-				printf( "	----- Decoy started at %f, %f, %f. Thrown by %s ------\n", x, y, z, planter->name );
+				printf( "	----- Decoy started at %f, %f, %f. Thrown by %s ------\n", x, y, z, planter->GetName().c_str() );
 			}
 			break;
 
 		//Update in array
 		case DECOY_FIRE:
 			{
-				printf( "	----- Decoy fired at %f, %f, %f. Thrown by %s ------\n", x, y, z, planter->name );
+				printf( "	----- Decoy fired at %f, %f, %f. Thrown by %s ------\n", x, y, z, planter->GetName().c_str() );
 			}
 			break;
 
 		//Remove from array
 		case DECOY_DETONATE:
 		{
-			printf( "	----- Decoy detonated at %f, %f, %f. Thrown by %s ------\n", x, y, z, planter->name );
+			printf( "	----- Decoy detonated at %f, %f, %f. Thrown by %s ------\n", x, y, z, planter->GetName().c_str() );
 		}
 		break;
 
@@ -1930,7 +1997,7 @@ void CDemoFileDump::HandleWeaponFire( const CSVCMsg_GameEvent &msg, const CSVCMs
 	const char *weapon = msg.keys( 1 ).val_string().c_str();
 	Player* player = FindPlayerInstance( userid );
 
-	printf( "	----- %s fired weapon %s. -----\n", player->name, weapon );
+	printf( "	----- %s fired weapon %s. -----\n", player->GetName().c_str(), weapon );
 
 	//Probing active weapon id
 	EntityEntry *pEntity = FindEntity( player->entityID + 1 );
@@ -1959,7 +2026,7 @@ void CDemoFileDump::HandlePlayerBlind( const CSVCMsg_GameEvent &msg, const CSVCM
 	//Sometimes finds gotv by accident??
 	if ( player && attacker )
 	{
-		printf( "	----- Player %s flashed by %s for %f seconds. -----\n", player->name, attacker->name, blindDuration );
+		printf( "	----- Player %s flashed by %s for %f seconds. -----\n", player->GetName().c_str(), attacker->GetName().c_str(), blindDuration );
 	}
 	
 	//TODO add to event array
@@ -1982,13 +2049,13 @@ void CDemoFileDump::HandlePlayerHurt( const CSVCMsg_GameEvent &msg, const CSVCMs
 
 	if ( attacker )
 	{
-		printf( "	----- Player %s hurt for %d damage (%d armour) by %s (weapon: %s, hitgroup: %d). -----\n", player->name, healthDamage, armourDamage, attacker->name, weapon, hitgroup );
+		printf( "	----- Player %s hurt for %d damage (%d armour) by %s (weapon: %s, hitgroup: %d). -----\n", player->GetName().c_str(), healthDamage, armourDamage, attacker->GetName().c_str(), weapon, hitgroup );
 	}
 	else
 	{
-		printf( "	----- Player %s hurt for %d damage (%d armour) by world. -----\n", player->name, healthDamage, armourDamage );
+		printf( "	----- Player %s hurt for %d damage (%d armour) by world. -----\n", player->GetName().c_str(), healthDamage, armourDamage );
 	}
-	printf( "		Remaining health: %d, remaining armour: %d\n", health, armour );
+	printf( "		----- Remaining health: %d, remaining armour: %d\n", health, armour );
 
 	//TODO add to event array/player state
 }
@@ -2018,38 +2085,38 @@ void CDemoFileDump::HandlePlayerDeath( const CSVCMsg_GameEvent &msg, const CSVCM
 		{
 			if ( assister )
 			{
-				printf( "	----- Player %s died to %s (Assist: %s). -----\n", player->name, attacker->name, assister->name );
+				printf( "	----- Player %s died to %s (Assist: %s). -----\n", player->GetName().c_str(), attacker->GetName().c_str(), assister->GetName().c_str() );
 			}
 			else
 			{
-				printf( "	----- Player %s died to %s. -----\n", player->name, attacker->name );			
+				printf( "	----- Player %s died to %s. -----\n", player->GetName().c_str(), attacker->GetName().c_str() );			
 			}
 		}
 		else
 		{
-			printf( "	----- Player %s died. -----\n", player->name );
+			printf( "	----- Player %s died. -----\n", player->GetName().c_str() );
 		}
-		printf( "		Weapon: %s \n", weaponName );
+		printf( "		----- Weapon: %s \n", weaponName );
 
 		if ( assistedFlash )
 		{		
-			printf( "		Assisted flash \n" );
+			printf( "		----- Assisted flash \n" );
 		}
 		if ( headshot )
 		{
-			printf( "		Headshot \n");
+			printf( "		----- Headshot \n");
 		}
 		if ( wallbang )
 		{
-			printf( "		Wallbang \n");
+			printf( "		----- Wallbang \n");
 		}
 		if ( throughSmoke )
 		{
-			printf( "		Through smoke \n");
+			printf( "		----- Through smoke \n");
 		}
 		if ( whileBlind )
 		{
-			printf( "		While blind \n");
+			printf( "		------ While blind \n");
 		}
 	}
 	else
@@ -2206,64 +2273,6 @@ void CDemoFileDump::ParseGameEvent( const CSVCMsg_GameEvent &msg, const CSVCMsg_
 				HandlePlayerDeath( msg, pDescriptor );
 			}
 		}
-		else{/*
-			if ( g_bDumpGameEvents )
-			{
-				printf("handling game events\n"); 
-				printf( "%s\n{\n", pDescriptor->name().c_str() );
-			}
-			int numKeys = msg.keys().size();
-			for ( int i = 0; i < numKeys; i++ )
-			{
-				const CSVCMsg_GameEventList::key_t& Key = pDescriptor->keys( i );
-				const CSVCMsg_GameEvent::key_t& KeyValue = msg.keys( i );
-				if ( g_bDumpGameEvents )
-				{
-					bool bHandled = false;
-					if ( Key.name().compare( "userid" ) == 0 || Key.name().compare( "attacker" ) == 0 || Key.name().compare( "assister" ) == 0 )
-					{
-						bHandled = ShowPlayerInfo( Key.name().c_str(), KeyValue.val_short(), g_bShowExtraPlayerInfoInGameEvents );
-					}
-					if ( !bHandled )
-					{
-						printf(" %s: ", Key.name().c_str() );
-						if ( KeyValue.has_val_string() )
-						{
-							printf( "%s ", KeyValue.val_string().c_str() );
-						}
-						if ( KeyValue.has_val_float() )
-						{
-							printf( "%f ", KeyValue.val_float() );
-						}
-						if ( KeyValue.has_val_long() )
-						{
-							printf( "%d ", KeyValue.val_long() );
-						}
-						if ( KeyValue.has_val_short() )
-						{
-							printf( "%d ", KeyValue.val_short() );
-						}
-						if ( KeyValue.has_val_byte() )
-						{
-							printf( "%d ", KeyValue.val_byte() );
-						}
-						if ( KeyValue.has_val_bool() )
-						{
-							printf( "%d ", KeyValue.val_bool() );
-						}
-						if ( KeyValue.has_val_uint64() )
-						{
-							printf( "%lld ", KeyValue.val_uint64() );
-						}
-						printf( "\n" );
-					}
-				}
-			}
-			if ( g_bDumpGameEvents )
-			{
-				printf( "}\n" );
-			}*/
-		}
 	}
 }
 
@@ -2282,16 +2291,6 @@ bool CDemoFileDump::ParseNextTick()
 	if ( s_bMatchStartOccured )
 	{
 		DisplayPlayerInfo();
-
-		printf( "Player positions: \n" );
-		for( int i = 0; i < s_PlayerInstances.size(); i++ )
-		{
-			
-			if ( s_PlayerInstances.at( i )->GetIsConnected() )
-			{				
-				s_PlayerInstances.at( i )->Print();
-			}
-		}
 	}
 
 	return b;

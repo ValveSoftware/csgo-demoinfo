@@ -12,7 +12,7 @@ public:
 		float x, float y, float z, float eyePitch, float eyeYaw, 
 		int health, int armour, bool hasHelmet, bool hasDefuseKit,
 		int money, float flashDuration );*/
-	Player( int GUID, int entityID, int userID, const char* name, bool isBot );
+	Player( int GUID, int entityID, int userID, std::string name, bool isBot );
 	~Player();
 
 	bool CheckBlind();
@@ -24,7 +24,7 @@ public:
 	bool GetIsBot();
 	int GetEntityID();
 	int GetUserID();
-	const char* GetName();
+	std::string GetName();
 	int GetTeam();
 	float GetX();
 	float GetY();
@@ -44,7 +44,6 @@ public:
 
 	int entityID;
 	int userID;
-	const char* name;
 	int teamID;
 	float x;
 	float y;
@@ -69,6 +68,7 @@ private:
 	int GUID;
 	bool isConnected;
 	bool isBot;
+	std::string name;
 };
 
 #endif
