@@ -22,6 +22,7 @@ Player::Player( int GUID, int entityID, int userID, std::string name, bool isBot
 	this->money = -1;
 	this->flashDuration = -1;
 	this->status = PLAYER_DEFAULT;
+	this->hasBomb = false;
 }
 
 Player::~Player()
@@ -39,6 +40,11 @@ bool Player::CheckDead()
 	return health <= 0;
 }
 
+void Player::RoundCleanUp()
+{
+	hasBomb = false;
+}
+
 void Player::Print()
 {
 	const char* helmetString = ( hasHelmet ) ? " (Helmet)" : "";
@@ -53,6 +59,10 @@ void Player::Print()
 	if ( CheckBlind() )
 	{
 		printf( "		----- Is flashed \n" );
+	}
+	if ( hasBomb )
+	{
+		printf( "		----- Holding bomb \n" );		
 	}
 }
 
@@ -81,6 +91,11 @@ std::string Player::GetName()
 	return this->name;
 }
 
+bool Player::GetHasBomb()
+{
+	return this->hasBomb;
+}
+
 void Player::SetIsConnected( bool isConnected )
 {
 	this->isConnected = isConnected;
@@ -89,4 +104,9 @@ void Player::SetIsConnected( bool isConnected )
 void Player::SetStatus( PlayerStatus status )
 {
 	this->status = status;
+}
+
+void Player::SetHasBomb( bool hasBomb )
+{
+	this->hasBomb = hasBomb;
 }

@@ -47,7 +47,6 @@ static std::vector< ServerClass_t > s_ServerClasses;
 static std::vector< CSVCMsg_SendTable > s_DataTables;
 static std::vector< ExcludeEntry > s_currentExcludes;
 static std::vector< EntityEntry * > s_Entities;
-static std::vector< player_info_t > s_PlayerInfos;
 static std::vector< Player* > s_PlayerInstances;
 
 extern bool g_bDumpGameEvents;
@@ -65,8 +64,6 @@ static int s_nCurrentRound = 1;
 static int s_nCurrentTick = 0;
 static int s_nBots = 0;
 static RoundStatus s_RoundStatus;
-
-player_info_t *FindPlayerByEntity(int entityID);
 
 __declspec( noreturn ) void fatal_errorf( const char* fmt, ... )
 {
@@ -137,32 +134,6 @@ Player *CDemoFileDump::FindPlayerInstanceByGUID( int GUID )
 			return *it;
 		}
 	}
-	return NULL;
-}
-
-player_info_t *FindPlayerByEntity( int entityId )
-{
-	for ( std::vector< player_info_t >::iterator j = s_PlayerInfos.begin(); j != s_PlayerInfos.end(); j++ ) 
-	{
-		if ( j->entityID == entityId ) 
-		{
-			return &(*j);
-		}
-	}
-
-	return NULL;
-}
-
-player_info_t *FindPlayerInfo( int userId )
-{
-	for ( std::vector< player_info_t >::iterator i = s_PlayerInfos.begin(); i != s_PlayerInfos.end(); i++ )
-	{
-		if (  i->userID == userId )
-		{
-			return &(*i);
-		}
-	}
-
 	return NULL;
 }
 
@@ -818,7 +789,6 @@ bool ParseDataTable( CBitRead &buf )
 		s_ServerClasses.push_back( entry );
 	}
 
-
 	if ( g_bDumpDataTables )
 	{
 		printf( "Flattening data tables..." );
@@ -856,7 +826,7 @@ bool DumpStringTable( CBitRead &buf, bool bIsUserInfo )
 		{
 			printf( "Clearing player info array.\n" );
 		}
-		s_PlayerInfos.clear();
+		//s_PlayerInfos.clear();
 	}
 
 	for ( int i = 0 ; i < numstrings; i++ )
@@ -1451,77 +1421,6 @@ void CDemoFileDump::DumpDemoPacket( CBitRead &buf, int length )
 
 /************************Display Information************************/
 
-//can remove/refactor this
-bool CDemoFileDump::ShowPlayerInfo( const char *pField, int nIndex, bool bShowDetails, bool bCSV )
-{
-	player_info_t *pPlayerInfo = FindPlayerInfo( nIndex );
-	if ( pPlayerInfo )
-	{
-		if ( bCSV )
-		{
-			printf( "%s, %s, %d", pField, pPlayerInfo->name, nIndex );
-		}
-		else
-		{
-			printf( " %s: %s (id:%d)\n", pField, pPlayerInfo->name, nIndex );
-		}
-
-		if ( bShowDetails )
-		{
-			int nEntityIndex = pPlayerInfo->entityID + 1;
-			EntityEntry *pEntity = FindEntity( nEntityIndex );
-			if ( pEntity )
-			{
-				PropEntry *pXYProp = pEntity->FindProp( "m_vecOrigin" );
-				PropEntry *pZProp = pEntity->FindProp( "m_vecOrigin[2]" );
-				/*
-				//Probing player entity properties
-				for (int i = 0; i < pEntity->m_props.size(); i++) {
-					printf("%s \n", pEntity->m_props.at(i)->m_pFlattenedProp->m_prop->var_name().c_str());
-				}*/
-				if ( pXYProp && pZProp )
-				{
-					if ( bCSV )
-					{
-						printf( ", %f, %f, %f", pXYProp->m_pPropValue->m_value.m_vector.x, pXYProp->m_pPropValue->m_value.m_vector.y, pZProp->m_pPropValue->m_value.m_float );
-					}
-					else
-					{
-						printf( "  position: %f, %f, %f\n", pXYProp->m_pPropValue->m_value.m_vector.x, pXYProp->m_pPropValue->m_value.m_vector.y, pZProp->m_pPropValue->m_value.m_float );
-					}
-				}
-				PropEntry *pAngle0Prop = pEntity->FindProp( "m_angEyeAngles[0]" );
-				PropEntry *pAngle1Prop = pEntity->FindProp( "m_angEyeAngles[1]" );
-				if ( pAngle0Prop && pAngle1Prop )
-				{
-					if ( bCSV )
-					{
-						printf( ", %f, %f", pAngle0Prop->m_pPropValue->m_value.m_float, pAngle1Prop->m_pPropValue->m_value.m_float );
-					}
-					else
-					{
-						printf( "  facing: pitch:%f, yaw:%f\n", pAngle0Prop->m_pPropValue->m_value.m_float, pAngle1Prop->m_pPropValue->m_value.m_float );
-					}
-				}
-				PropEntry *pTeamProp = pEntity->FindProp( "m_iTeamNum" );
-				if ( pTeamProp )
-				{
-					if ( bCSV )
-					{
-						printf( ", %s", ( pTeamProp->m_pPropValue->m_value.m_int == 2 ) ? "T" : "CT" );
-					}
-					else
-					{
-						printf( "  team: %s\n", ( pTeamProp->m_pPropValue->m_value.m_int == 2 ) ? "T" : "CT" );
-					}
-				}
-			}
-		}
-		return true;
-	}
-	return false;
-}
-
 void CDemoFileDump::DisplayPlayerInfo()
 {
 	EntityEntry *pEntity;
@@ -1602,9 +1501,9 @@ void CDemoFileDump::DisplayPlayerInfo()
 	{			
 		if ( ( *it )->GetIsConnected() )
 		{				
-			//( *it )->Print();
+			( *it )->Print();
 		}
-		( *it )->Print();
+		//( *it )->Print();
 	}
 }
 
@@ -1622,6 +1521,7 @@ void CDemoFileDump::HandlePlayerConnection( const CSVCMsg_GameEvent &msg, const 
 	bool bBot = false;
 	const char *reason = NULL;
 	int GUID = -1;
+
 	for ( int i = 0; i < numKeys; i++ )
 	{
 		const CSVCMsg_GameEventList::key_t& Key = pDescriptor->keys( i );
@@ -1664,17 +1564,16 @@ void CDemoFileDump::HandlePlayerConnection( const CSVCMsg_GameEvent &msg, const 
 		if ( !bBot )
 		{
 			Player* connectingPlayer = FindPlayerInstanceByGUID( GUID );
-
 			//New player connecting
 			if ( !connectingPlayer )
 			{			
-				printf("	Player %d %s (id:%d) connected. EntityID: %d \n", GUID, name, userid, index + 1);
+				printf("	----- Player %d %s (id:%d) connected. EntityID: %d \n", GUID, name, userid, index + 1);
 				s_PlayerInstances.push_back( new Player( GUID, index, userid, name, bBot ) );
 			}
 			//Existing playing reconnected
 			else
 			{			
-				printf("	Player %d %s (id:%d) reconnected. EntityID: %d \n", GUID, name, userid, index + 1);
+				printf("	----- Player %d %s (id:%d) reconnected. EntityID: %d \n", GUID, name, userid, index + 1);
 				//Once a player reconnects they get a new userID and entityID? thanks volvo
 				connectingPlayer->userID = userid;
 				connectingPlayer->entityID = index;
@@ -1686,7 +1585,6 @@ void CDemoFileDump::HandlePlayerConnection( const CSVCMsg_GameEvent &msg, const 
 			//Bots don't have a GUID, and userids/entity ids aren't static. We'll find (existing) bots by name
 			//Might make this a function
 			Player* connectingBot = NULL;
-
 			for ( std::vector< Player* >::iterator it = s_PlayerInstances.begin(); it != s_PlayerInstances.end(); ++it )
 			{			
 				if ( ( *it )->GetName().compare( name ) == 0 && ( *it )->GetIsBot() )
@@ -1699,43 +1597,18 @@ void CDemoFileDump::HandlePlayerConnection( const CSVCMsg_GameEvent &msg, const 
 			{				
 				//Gives bots a unique GUID for our own reference
 				GUID = -100 * ( ++s_nBots );
-				printf("	Bot %d %s (id:%d) connected. EntityID: %d \n", GUID, name, userid, index + 1);
+				printf("	----- Bot %d %s (id:%d) connected. EntityID: %d \n", GUID, name, userid, index + 1);
 				s_PlayerInstances.push_back( new Player( GUID, index, userid, name, bBot ) );
 			}
 			else
 			{
 				//idk if a bot can reconnect but here it is
-				printf("	Bot %d %s (id:%d) reconnected. EntityID: %d \n", connectingBot->GetGUID(), name, userid, index + 1);
+				printf("	----- Bot %d %s (id:%d) reconnected. EntityID: %d \n", connectingBot->GetGUID(), name, userid, index + 1);
 				connectingBot->userID = userid;
 				connectingBot->entityID = index;
 				connectingBot->SetIsConnected( true );
 			}
 		}
-
-
-
-		/*player_info_t newPlayer;
-		memset( &newPlayer, 0, sizeof(newPlayer) );
-		newPlayer.userID = userid;
-		strcpy_s( newPlayer.name, name );
-		newPlayer.fakeplayer = bBot;
-		if ( bBot )
-		{
-			strcpy_s( newPlayer.guid, "BOT" );
-		}
-		
-		newPlayer.entityID = index;
-		auto existing = FindPlayerByEntity( index );
-		
-		// add entity if it doesn't exist, update if it does
-		if (!existing) {
-			printf("	Player %s %s (id:%d) connected. EntityID: %d \n", newPlayer.guid, name, userid, newPlayer.entityID + 1);
-			s_PlayerInfos.push_back(newPlayer);
-		}
-		else {
-			*existing = newPlayer;
-			printf("	Player %s %s (id:%d) reconnected. EntityID: %d \n", newPlayer.guid, name, userid, newPlayer.entityID + 1);
-		}*/	
 	}
 	else
 	{
@@ -1745,7 +1618,7 @@ void CDemoFileDump::HandlePlayerConnection( const CSVCMsg_GameEvent &msg, const 
 			//If this fails to find, we have a problem lmao
 			if ( disconnectingPlayer )
 			{
-				printf("	Player %d %s (id:%d) disconnected. EntityID: %d. Reason: %s\n", GUID, name, userid, disconnectingPlayer->entityID, reason);
+				printf("	----- Player %d %s (id:%d) disconnected. EntityID: %d. Reason: %s\n", GUID, name, userid, disconnectingPlayer->entityID, reason);
 				disconnectingPlayer->SetIsConnected( false );
 				disconnectingPlayer->userID = -1;
 				disconnectingPlayer->entityID = -1;		
@@ -1754,7 +1627,6 @@ void CDemoFileDump::HandlePlayerConnection( const CSVCMsg_GameEvent &msg, const 
 		else
 		{			
 			Player* disconnectingBot = NULL;
-
 			//Bots don't have a GUID in the networked message, so we have to find it by name
 			for ( std::vector< Player* >::iterator it = s_PlayerInstances.begin(); it != s_PlayerInstances.end(); ++it )
 			{			
@@ -1765,22 +1637,12 @@ void CDemoFileDump::HandlePlayerConnection( const CSVCMsg_GameEvent &msg, const 
 			}		
 			if ( disconnectingBot )
 			{
-				printf("	Bot %d %s (id:%d) disconnected. EntityID: %d. Reason: %s\n", disconnectingBot->GetGUID(), name, userid, disconnectingBot->entityID, reason);
+				printf("	----- Bot %d %s (id:%d) disconnected. EntityID: %d. Reason: %s\n", disconnectingBot->GetGUID(), name, userid, disconnectingBot->entityID, reason);
 				disconnectingBot->SetIsConnected( false );
 				disconnectingBot->userID = -1;
 				disconnectingBot->entityID = -1;		
 			}
 		}
-
-		/*printf( "	Player %s (id:%d) disconnected. reason: %s\n", name, userid, reason );		
-		// mark the player info slot as disconnected
-		player_info_t *pPlayerInfo = FindPlayerInfo( userid );
-		if ( pPlayerInfo )
-		{
-			//strcpy_s( pPlayerInfo->name, "disconnected" );
-			pPlayerInfo->userID = -1;
-			pPlayerInfo->guid[ 0 ] = 0;
-		}*/
 	}
 }
 
@@ -1819,6 +1681,7 @@ void CDemoFileDump::HandleBombEvent( const CSVCMsg_GameEvent &msg, const CSVCMsg
 		case B_COMPLETE_PLANT:
 			{
 				action = "planter at";
+				planter->SetHasBomb( false );
 				printf( "	----- Bomb has been planted on %d ------\n", bombsite );				
 			}
 			break;
@@ -1849,6 +1712,7 @@ void CDemoFileDump::HandleBombEvent( const CSVCMsg_GameEvent &msg, const CSVCMsg
 		case B_PICK_UP:
 			{
 				action = "picked up at";
+				planter->SetHasBomb( true );
 				printf( "	----- Bomb has been picked up by %s -----\n", planter->GetName().c_str() );
 			}
 			break;
@@ -1857,6 +1721,7 @@ void CDemoFileDump::HandleBombEvent( const CSVCMsg_GameEvent &msg, const CSVCMsg
 		case B_DROP:
 			{
 				action = "dropped at";
+				planter->SetHasBomb( false );
 				printf( "	----- Bomb has been dropped by %s -----\n", planter->GetName().c_str() );
 			}
 			break;
@@ -1880,7 +1745,7 @@ void CDemoFileDump::HandleBombEvent( const CSVCMsg_GameEvent &msg, const CSVCMsg
 		PropEntry* pZProp = pEntity->FindProp( "m_vecOrigin[2]" );
 		if ( pXYProp && pZProp )
 		{			
-			printf("  %s %s position: %f, %f, %f\n", planter->GetName().c_str(), action, pXYProp->m_pPropValue->m_value.m_vector.x, pXYProp->m_pPropValue->m_value.m_vector.y, pZProp->m_pPropValue->m_value.m_float );
+			printf("  	----- %s %s position: %f, %f, %f\n", planter->GetName().c_str(), action, pXYProp->m_pPropValue->m_value.m_vector.x, pXYProp->m_pPropValue->m_value.m_vector.y, pZProp->m_pPropValue->m_value.m_float );
 		}
 	}
 	//TODO
@@ -1998,6 +1863,7 @@ void CDemoFileDump::HandleWeaponFire( const CSVCMsg_GameEvent &msg, const CSVCMs
 	Player* player = FindPlayerInstance( userid );
 
 	printf( "	----- %s fired weapon %s. -----\n", player->GetName().c_str(), weapon );
+	player->status = PLAYER_FIRING;
 
 	//Probing active weapon id
 	EntityEntry *pEntity = FindEntity( player->entityID + 1 );
@@ -2127,6 +1993,32 @@ void CDemoFileDump::HandlePlayerDeath( const CSVCMsg_GameEvent &msg, const CSVCM
 	//TODO add to event array	
 }
 
+//TODO more clean up
+void CDemoFileDump::HandleTickStart()
+{
+	for ( std::vector< Player* >::iterator it = s_PlayerInstances.begin(); it != s_PlayerInstances.end(); ++it )
+	{			
+		if ( ( *it )->GetIsConnected() )
+		{				
+			//Reset status
+			( *it )->status = PLAYER_DEFAULT;
+		}
+	}
+}
+
+//TODO more cleanup
+void CDemoFileDump::HandleRoundCleanUp()
+{
+	//Call RoundCleanUp() on each player
+	for ( std::vector< Player* >::iterator it = s_PlayerInstances.begin(); it != s_PlayerInstances.end(); ++it )
+	{			
+		if ( ( *it )->GetIsConnected() )
+		{				
+			( *it )->RoundCleanUp();
+		}
+	}
+}
+
 
 /************************Parsing Demo************************/
 
@@ -2171,7 +2063,7 @@ void CDemoFileDump::ParseGameEvent( const CSVCMsg_GameEvent &msg, const CSVCMsg_
 			}
 			else if (gameEvent.compare( "round_officially_ended" ) == 0 )
 			{
-				//TODO Invoke HandleRoundCleanup()
+				this->HandleRoundCleanUp();
 				printf("----- Round %d after-time has ended -----\n", s_nCurrentRound);
 			}
 
@@ -2292,13 +2184,16 @@ bool CDemoFileDump::ParseNextTick()
 	{
 		DisplayPlayerInfo();
 	}
+	//Reset for the next tick
+	HandleTickStart();
+	printf( "----- End of Tick %d -----\n", s_nCurrentTick );
 
 	return b;
 }
 
 bool CDemoFileDump::ParseTick()
-{
-	int	tick = 0;
+{	
+	int				tick;
 	unsigned char	cmd;
 	unsigned char	playerSlot;
 	m_demofile.ReadCmdHeader( cmd, tick, playerSlot );

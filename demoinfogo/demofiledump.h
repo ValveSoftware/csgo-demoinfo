@@ -259,6 +259,8 @@ private:
 	void HandlePlayerBlind( const CSVCMsg_GameEvent &msg, const CSVCMsg_GameEventList::descriptor_t *pDescriptor );
 	void HandlePlayerHurt( const CSVCMsg_GameEvent &msg, const CSVCMsg_GameEventList::descriptor_t *pDescriptor );
 	void HandlePlayerDeath( const CSVCMsg_GameEvent &msg, const CSVCMsg_GameEventList::descriptor_t *pDescriptor );
+	void HandleTickStart();
+	void HandleRoundCleanUp();
 
 	void DisplayPlayerInfo();
 	bool ShowPlayerInfo( const char *pField, int nIndex, bool bShowDetails = true, bool bCSV = false );

@@ -17,6 +17,7 @@ public:
 
 	bool CheckBlind();
 	bool CheckDead();
+	void RoundCleanUp();
 	void Print();
 
 	int GetGUID();
@@ -38,9 +39,11 @@ public:
 	int GetMoney();
 	float GetFlashDuration();
 	PlayerStatus GetStatus();
+	bool GetHasBomb();
 
 	void SetIsConnected ( bool isConnected );
 	void SetStatus( PlayerStatus status );
+	void SetHasBomb( bool hasBomb );
 
 	int entityID;
 	int userID;
@@ -57,6 +60,7 @@ public:
 	int money;
 	float flashDuration;
 	PlayerStatus status;
+	bool hasBomb;
 	//int kills;
 	//int assists;
 	//int deaths;
