@@ -48,6 +48,7 @@ static std::vector< CSVCMsg_SendTable > s_DataTables;
 static std::vector< ExcludeEntry > s_currentExcludes;
 static std::vector< EntityEntry * > s_Entities;
 static std::vector< Player* > s_PlayerInstances;
+static std::vector< TickInfo* > s_TickInfos;
 
 extern bool g_bDumpGameEvents;
 extern bool g_bSupressFootstepEvents;
@@ -100,6 +101,12 @@ void CDemoFileDump::CleanUp()
 		delete *it;
 	}
 	s_PlayerInstances.clear();
+
+	for ( std::vector< TickInfo* >::iterator it = s_TickInfos.begin(); it != s_TickInfos.end(); ++it )
+	{			
+		delete *it;
+	}
+	s_TickInfos.clear();
 }
 
 template< typename T >
@@ -1496,6 +1503,7 @@ void CDemoFileDump::DisplayPlayerInfo()
 		}
 	}
 
+	/*
 	printf( "Player positions: \n" );
 	for ( std::vector< Player* >::iterator it = s_PlayerInstances.begin(); it != s_PlayerInstances.end(); ++it )
 	{			
@@ -1504,7 +1512,7 @@ void CDemoFileDump::DisplayPlayerInfo()
 			( *it )->Print();
 		}
 		//( *it )->Print();
-	}
+	}*/
 }
 
 
@@ -1578,6 +1586,7 @@ void CDemoFileDump::HandlePlayerConnection( const CSVCMsg_GameEvent &msg, const 
 				connectingPlayer->userID = userid;
 				connectingPlayer->entityID = index;
 				connectingPlayer->SetIsConnected( true );
+				connectingPlayer->SetStatus( PLAYER_DEFAULT );
 			}
 		}
 		else
@@ -1607,6 +1616,7 @@ void CDemoFileDump::HandlePlayerConnection( const CSVCMsg_GameEvent &msg, const 
 				connectingBot->userID = userid;
 				connectingBot->entityID = index;
 				connectingBot->SetIsConnected( true );
+				connectingBot->SetStatus( PLAYER_DEFAULT );
 			}
 		}
 	}
@@ -1621,7 +1631,8 @@ void CDemoFileDump::HandlePlayerConnection( const CSVCMsg_GameEvent &msg, const 
 				printf("	----- Player %d %s (id:%d) disconnected. EntityID: %d. Reason: %s\n", GUID, name, userid, disconnectingPlayer->entityID, reason);
 				disconnectingPlayer->SetIsConnected( false );
 				disconnectingPlayer->userID = -1;
-				disconnectingPlayer->entityID = -1;		
+				disconnectingPlayer->entityID = -1;
+				disconnectingPlayer->SetStatus( PLAYER_DEFAULT );	
 			}
 		}
 		else
@@ -1640,7 +1651,8 @@ void CDemoFileDump::HandlePlayerConnection( const CSVCMsg_GameEvent &msg, const 
 				printf("	----- Bot %d %s (id:%d) disconnected. EntityID: %d. Reason: %s\n", disconnectingBot->GetGUID(), name, userid, disconnectingBot->entityID, reason);
 				disconnectingBot->SetIsConnected( false );
 				disconnectingBot->userID = -1;
-				disconnectingBot->entityID = -1;		
+				disconnectingBot->entityID = -1;
+				disconnectingBot->SetStatus( PLAYER_DEFAULT );	
 			}
 		}
 	}
@@ -1666,6 +1678,7 @@ void CDemoFileDump::HandleBombEvent( const CSVCMsg_GameEvent &msg, const CSVCMsg
 		case B_BEGIN_PLANT:
 			{
 				action = "planter at";
+				planter->SetStatus( PLAYER_PLANTING );
 				printf( "	----- Bomb planting on %d ------\n", bombsite );
 			}
 			break;
@@ -1673,6 +1686,7 @@ void CDemoFileDump::HandleBombEvent( const CSVCMsg_GameEvent &msg, const CSVCMsg
 		case B_ABORT_PLANT:
 			{
 				action = "planter at";
+				planter->SetStatus( PLAYER_DEFAULT );
 				printf( "	----- Bomb plant has been aborted on %d ------\n", bombsite );
 			}
 			break;
@@ -1682,6 +1696,7 @@ void CDemoFileDump::HandleBombEvent( const CSVCMsg_GameEvent &msg, const CSVCMsg
 			{
 				action = "planter at";
 				planter->SetHasBomb( false );
+				planter->SetStatus( PLAYER_DEFAULT );
 				printf( "	----- Bomb has been planted on %d ------\n", bombsite );				
 			}
 			break;
@@ -1689,6 +1704,7 @@ void CDemoFileDump::HandleBombEvent( const CSVCMsg_GameEvent &msg, const CSVCMsg
 		case B_BEGIN_DEFUSE:
 			{
 				action = "defuser at";
+				planter->SetStatus( PLAYER_DEFUSING );
 				printf( "	----- Bomb defusing on %d ------\n", bombsite );
 			}
 			break;
@@ -1696,6 +1712,7 @@ void CDemoFileDump::HandleBombEvent( const CSVCMsg_GameEvent &msg, const CSVCMsg
 		case B_ABORT_DEFUSE:
 			{
 				action = "defuser at";
+				planter->SetStatus( PLAYER_DEFAULT );
 				printf( "	----- Bomb has been defused on %d ------\n", bombsite );				
 			}
 			break;
@@ -1704,6 +1721,7 @@ void CDemoFileDump::HandleBombEvent( const CSVCMsg_GameEvent &msg, const CSVCMsg
 		case B_COMPLETE_DEFUSE:
 			{
 				action = "defuser at";
+				planter->SetStatus( PLAYER_DEFAULT );
 				printf( "	----- Bomb defuse has been aborted on %d ------\n", bombsite );				
 			}
 			break;
@@ -1863,7 +1881,7 @@ void CDemoFileDump::HandleWeaponFire( const CSVCMsg_GameEvent &msg, const CSVCMs
 	Player* player = FindPlayerInstance( userid );
 
 	printf( "	----- %s fired weapon %s. -----\n", player->GetName().c_str(), weapon );
-	player->status = PLAYER_FIRING;
+	player->SetStatus( PLAYER_FIRING );
 
 	//Probing active weapon id
 	EntityEntry *pEntity = FindEntity( player->entityID + 1 );
@@ -1984,6 +2002,7 @@ void CDemoFileDump::HandlePlayerDeath( const CSVCMsg_GameEvent &msg, const CSVCM
 		{
 			printf( "		------ While blind \n");
 		}
+		player->SetStatus( PLAYER_DEFAULT );
 	}
 	else
 	{
@@ -2001,7 +2020,7 @@ void CDemoFileDump::HandleTickStart()
 		if ( ( *it )->GetIsConnected() )
 		{				
 			//Reset status
-			( *it )->status = PLAYER_DEFAULT;
+			( *it )->TickCleanUp();
 		}
 	}
 }
@@ -2174,6 +2193,10 @@ void CDemoFileDump::ParseToEnd()
 	{
 
 	}
+	for ( std::vector< TickInfo* >::iterator it = s_TickInfos.begin(); it != s_TickInfos.end(); ++it )
+	{			
+		( *it )->Print();
+	}
 	CleanUp();
 }
 
@@ -2183,6 +2206,14 @@ bool CDemoFileDump::ParseNextTick()
 	if ( s_bMatchStartOccured )
 	{
 		DisplayPlayerInfo();
+
+		//Consolidate information into tick container
+		TickInfo* tickInfo = new TickInfo( s_nCurrentTick, s_nCurrentRound, s_RoundStatus );
+		for ( std::vector< Player* >::iterator it = s_PlayerInstances.begin(); it != s_PlayerInstances.end(); ++it )
+		{			
+			tickInfo->AddPlayer(( *it ));
+		}
+		s_TickInfos.push_back( tickInfo );
 	}
 	//Reset for the next tick
 	HandleTickStart();

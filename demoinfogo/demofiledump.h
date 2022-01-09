@@ -29,6 +29,7 @@
 #include "demofilebitbuf.h"
 #include "demofilepropdecode.h"
 #include "player.h"
+#include "tickinfo.h"
 #include "enums.h"
 
 #include "generated_proto/netmessages_public.pb.h"

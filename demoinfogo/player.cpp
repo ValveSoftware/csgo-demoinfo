@@ -25,6 +25,30 @@ Player::Player( int GUID, int entityID, int userID, std::string name, bool isBot
 	this->hasBomb = false;
 }
 
+Player::Player( Player* player )
+{
+	this->GUID = player->GUID;
+	this->isConnected = player->isConnected;
+	this->isBot = player->isBot;
+	this->entityID = player->entityID;
+	this->userID = player->userID;
+	this->name = player->name;
+	this->teamID = player->teamID;
+	this->x = player->x;
+	this->y = player->y;
+	this->z = player->z;
+	this->eyePitch = player->eyePitch;
+	this->eyeYaw = player->eyeYaw;
+	this->health = player->health;
+	this->armour = player->armour;
+	this->hasHelmet = player->hasHelmet;
+	this->hasDefuseKit = player->hasDefuseKit;
+	this->money = player->money;
+	this->flashDuration = player->flashDuration;
+	this->status = player->status;
+	this->hasBomb = player->hasBomb;
+}
+
 Player::~Player()
 {
 
@@ -40,9 +64,20 @@ bool Player::CheckDead()
 	return health <= 0;
 }
 
+void Player::TickCleanUp()
+{
+	//If a player was planting/defusing on the previous tick, they'll keep planting/defusing
+	//Firing a weapon/dying/aborting will trump their planting/defusing state automatically
+	if ( status != PLAYER_PLANTING && status != PLAYER_DEFUSING )
+	{
+		status = PLAYER_DEFAULT;
+	}
+}
+
 void Player::RoundCleanUp()
 {
 	hasBomb = false;
+	status = PLAYER_DEFAULT;
 }
 
 void Player::Print()

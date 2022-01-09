@@ -13,10 +13,12 @@ public:
 		int health, int armour, bool hasHelmet, bool hasDefuseKit,
 		int money, float flashDuration );*/
 	Player( int GUID, int entityID, int userID, std::string name, bool isBot );
+	Player( Player* player );
 	~Player();
 
 	bool CheckBlind();
 	bool CheckDead();
+	void TickCleanUp();
 	void RoundCleanUp();
 	void Print();
 
@@ -59,7 +61,6 @@ public:
 	bool hasDefuseKit;
 	int money;
 	float flashDuration;
-	PlayerStatus status;
 	bool hasBomb;
 	//int kills;
 	//int assists;
@@ -73,6 +74,7 @@ private:
 	bool isConnected;
 	bool isBot;
 	std::string name;
+	PlayerStatus status;
 };
 
 #endif
