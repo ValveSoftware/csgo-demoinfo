@@ -3,6 +3,7 @@
 
 #include "enums.h"
 #include "player.h"
+#include "bombentity.h"
 #include <vector>
 
 class TickInfo
@@ -12,6 +13,7 @@ public:
 	~TickInfo();
 
 	void AddPlayer( Player* player );
+	void AddBomb( BombEntity* bomb );
 	void Print();
 
 private:
@@ -19,6 +21,7 @@ private:
 	int roundNumber;
 	RoundStatus roundStatus;
 	std::vector< Player > playersInTick;
+	BombEntity bomb;
 };
 
 #endif

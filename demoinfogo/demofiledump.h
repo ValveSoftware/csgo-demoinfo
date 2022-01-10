@@ -29,6 +29,7 @@
 #include "demofilebitbuf.h"
 #include "demofilepropdecode.h"
 #include "player.h"
+#include "bombentity.h"
 #include "tickinfo.h"
 #include "enums.h"
 
@@ -263,7 +264,7 @@ private:
 	void HandleTickStart();
 	void HandleRoundCleanUp();
 
-	void DisplayPlayerInfo();
+	void GetPlayerInfo();
 	bool ShowPlayerInfo( const char *pField, int nIndex, bool bShowDetails = true, bool bCSV = false );
 };
 

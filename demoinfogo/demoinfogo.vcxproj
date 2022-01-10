@@ -116,6 +116,7 @@ protoc-2.5.0-win32\protoc.exe --proto_path=.\protobuf-2.5.0\src --proto_path=. -
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="bombentity.cpp" />
     <ClCompile Include="demofile.cpp" />
     <ClCompile Include="demofilebitbuf.cpp" />
     <ClCompile Include="demofiledump.cpp" />
@@ -127,6 +128,7 @@ protoc-2.5.0-win32\protoc.exe --proto_path=.\protobuf-2.5.0\src --proto_path=. -
     <ClCompile Include="tickinfo.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="bombentity.h" />
     <ClInclude Include="demofile.h" />
     <ClInclude Include="demofilebitbuf.h" />
     <ClInclude Include="demofiledump.h" />

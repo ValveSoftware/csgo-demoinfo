@@ -19,6 +19,11 @@ void TickInfo::AddPlayer( Player* player )
 	playersInTick.push_back( addedPlayer );
 }
 
+void TickInfo::AddBomb( BombEntity* bomb )
+{
+	this->bomb = BombEntity( bomb );
+}
+
 void TickInfo::Print()
 {
 	printf( "Tick %d Info: \n", tickNumber );
@@ -34,4 +39,5 @@ void TickInfo::Print()
 		}
 		//( *it )->Print();
 	}
+	bomb.Print();
 }

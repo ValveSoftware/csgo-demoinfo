@@ -47,8 +47,6 @@ static std::vector< ServerClass_t > s_ServerClasses;
 static std::vector< CSVCMsg_SendTable > s_DataTables;
 static std::vector< ExcludeEntry > s_currentExcludes;
 static std::vector< EntityEntry * > s_Entities;
-static std::vector< Player* > s_PlayerInstances;
-static std::vector< TickInfo* > s_TickInfos;
 
 extern bool g_bDumpGameEvents;
 extern bool g_bSupressFootstepEvents;
@@ -65,6 +63,9 @@ static int s_nCurrentRound = 1;
 static int s_nCurrentTick = 0;
 static int s_nBots = 0;
 static RoundStatus s_RoundStatus;
+static std::vector< Player* > s_PlayerInstances;
+static std::vector< TickInfo* > s_TickInfos;
+static BombEntity* bomb;
 
 __declspec( noreturn ) void fatal_errorf( const char* fmt, ... )
 {
@@ -107,6 +108,8 @@ void CDemoFileDump::CleanUp()
 		delete *it;
 	}
 	s_TickInfos.clear();
+
+	delete bomb;
 }
 
 template< typename T >
@@ -1428,7 +1431,7 @@ void CDemoFileDump::DumpDemoPacket( CBitRead &buf, int length )
 
 /************************Display Information************************/
 
-void CDemoFileDump::DisplayPlayerInfo()
+void CDemoFileDump::GetPlayerInfo()
 {
 	EntityEntry *pEntity;
 	Player *pPlayer;
@@ -1664,8 +1667,8 @@ void CDemoFileDump::HandleBombEvent( const CSVCMsg_GameEvent &msg, const CSVCMsg
 	int userid = msg.keys( 0 ).val_short();
 	int bombsite = -1;
 	char* action = NULL;
-	Player* planter = FindPlayerInstance( userid );
-	EntityEntry *pEntity = FindEntity( planter->entityID + 1 );
+	Player* player = FindPlayerInstance( userid );
+	EntityEntry *pEntity = FindEntity( player->entityID + 1 );
 
 	if ( event != B_PICK_UP && event != B_DROP )
 	{
@@ -1678,7 +1681,7 @@ void CDemoFileDump::HandleBombEvent( const CSVCMsg_GameEvent &msg, const CSVCMsg
 		case B_BEGIN_PLANT:
 			{
 				action = "planter at";
-				planter->SetStatus( PLAYER_PLANTING );
+				player->SetStatus( PLAYER_PLANTING );
 				printf( "	----- Bomb planting on %d ------\n", bombsite );
 			}
 			break;
@@ -1686,17 +1689,21 @@ void CDemoFileDump::HandleBombEvent( const CSVCMsg_GameEvent &msg, const CSVCMsg
 		case B_ABORT_PLANT:
 			{
 				action = "planter at";
-				planter->SetStatus( PLAYER_DEFAULT );
+				player->SetStatus( PLAYER_DEFAULT );
 				printf( "	----- Bomb plant has been aborted on %d ------\n", bombsite );
 			}
 			break;
 
-		//Should add bomb to array
 		case B_COMPLETE_PLANT:
 			{
 				action = "planter at";
-				planter->SetHasBomb( false );
-				planter->SetStatus( PLAYER_DEFAULT );
+				player->SetHasBomb( false );
+				player->SetStatus( PLAYER_DEFAULT );
+				bomb->SetX( player->x );
+				bomb->SetY( player->y );
+				bomb->SetZ( player->z );
+				bomb->SetIsPlanted( true );
+				bomb->SetIsOnPlayer( false );
 				printf( "	----- Bomb has been planted on %d ------\n", bombsite );				
 			}
 			break;
@@ -1704,7 +1711,7 @@ void CDemoFileDump::HandleBombEvent( const CSVCMsg_GameEvent &msg, const CSVCMsg
 		case B_BEGIN_DEFUSE:
 			{
 				action = "defuser at";
-				planter->SetStatus( PLAYER_DEFUSING );
+				player->SetStatus( PLAYER_DEFUSING );
 				printf( "	----- Bomb defusing on %d ------\n", bombsite );
 			}
 			break;
@@ -1712,42 +1719,50 @@ void CDemoFileDump::HandleBombEvent( const CSVCMsg_GameEvent &msg, const CSVCMsg
 		case B_ABORT_DEFUSE:
 			{
 				action = "defuser at";
-				planter->SetStatus( PLAYER_DEFAULT );
+				player->SetStatus( PLAYER_DEFAULT );
 				printf( "	----- Bomb has been defused on %d ------\n", bombsite );				
 			}
 			break;
 
-		//Should change state of bomb in array
 		case B_COMPLETE_DEFUSE:
 			{
 				action = "defuser at";
-				planter->SetStatus( PLAYER_DEFAULT );
+				player->SetStatus( PLAYER_DEFAULT );
+				bomb->SetIsDefused( true );
 				printf( "	----- Bomb defuse has been aborted on %d ------\n", bombsite );				
 			}
 			break;
 
-		//Should remove bomb from array
 		case B_PICK_UP:
 			{
 				action = "picked up at";
-				planter->SetHasBomb( true );
-				printf( "	----- Bomb has been picked up by %s -----\n", planter->GetName().c_str() );
+				player->SetHasBomb( true );
+				bomb->SetX( player->x );
+				bomb->SetY( player->y );
+				bomb->SetZ( player->z );
+				bomb->SetIsPlanted( false );
+				bomb->SetIsOnPlayer( true );
+				printf( "	----- Bomb has been picked up by %s -----\n", player->GetName().c_str() );
 			}
 			break;
 
-		//Should add bomb to array
 		case B_DROP:
 			{
 				action = "dropped at";
-				planter->SetHasBomb( false );
-				printf( "	----- Bomb has been dropped by %s -----\n", planter->GetName().c_str() );
+				player->SetHasBomb( false );
+				bomb->SetX( player->x );
+				bomb->SetY( player->y );
+				bomb->SetZ( player->z );
+				bomb->SetIsPlanted( false );
+				bomb->SetIsOnPlayer( false );
+				printf( "	----- Bomb has been dropped by %s -----\n", player->GetName().c_str() );
 			}
 			break;
 
-		//Should remove bomb from array
 		case B_EXPLODE:
 			{
 				action = "dropped at";
+				bomb->SetIsDetonated( true );
 				printf( "	----- Bomb has exploded on %d -----\n", bombsite );
 			}
 			break;
@@ -1763,7 +1778,7 @@ void CDemoFileDump::HandleBombEvent( const CSVCMsg_GameEvent &msg, const CSVCMsg
 		PropEntry* pZProp = pEntity->FindProp( "m_vecOrigin[2]" );
 		if ( pXYProp && pZProp )
 		{			
-			printf("  	----- %s %s position: %f, %f, %f\n", planter->GetName().c_str(), action, pXYProp->m_pPropValue->m_value.m_vector.x, pXYProp->m_pPropValue->m_value.m_vector.y, pZProp->m_pPropValue->m_value.m_float );
+			printf("  	----- %s %s position: %f, %f, %f\n", player->GetName().c_str(), action, pXYProp->m_pPropValue->m_value.m_vector.x, pXYProp->m_pPropValue->m_value.m_vector.y, pZProp->m_pPropValue->m_value.m_float );
 		}
 	}
 	//TODO
@@ -2036,6 +2051,7 @@ void CDemoFileDump::HandleRoundCleanUp()
 			( *it )->RoundCleanUp();
 		}
 	}
+	bomb->RoundCleanUp();
 }
 
 
@@ -2055,6 +2071,11 @@ void CDemoFileDump::ParseGameEvent( const CSVCMsg_GameEvent &msg, const CSVCMsg_
 		else if ( gameEvent.compare( "player_disconnect" ) == 0 )
 		{
 			HandlePlayerConnection( msg, pDescriptor, false );
+		}
+		//Round starts before match starts, so the bomb can be picked up before the match starts
+		else if ( gameEvent.compare( "bomb_pickup" ) == 0 )
+		{
+			HandleBombEvent( msg, pDescriptor, B_PICK_UP );
 		}
 		else if ( gameEvent.compare( "begin_new_match" ) == 0 )
 		{
@@ -2110,10 +2131,6 @@ void CDemoFileDump::ParseGameEvent( const CSVCMsg_GameEvent &msg, const CSVCMsg_
 			else if ( gameEvent.compare( "bomb_defused" ) == 0 )
 			{
 				HandleBombEvent( msg, pDescriptor, B_COMPLETE_DEFUSE );
-			}
-			else if ( gameEvent.compare( "bomb_pickup" ) == 0 )
-			{
-				HandleBombEvent( msg, pDescriptor, B_PICK_UP );
 			}
 			else if ( gameEvent.compare( "bomb_dropped" ) == 0 )
 			{
@@ -2189,6 +2206,9 @@ void CDemoFileDump::ParseGameEvent( const CSVCMsg_GameEvent &msg, const CSVCMsg_
 
 void CDemoFileDump::ParseToEnd()
 {
+	//TODO make an init()
+	bomb = new BombEntity();
+	
 	while( ParseNextTick() )
 	{
 
@@ -2205,7 +2225,7 @@ bool CDemoFileDump::ParseNextTick()
 	bool b = ParseTick();
 	if ( s_bMatchStartOccured )
 	{
-		DisplayPlayerInfo();
+		GetPlayerInfo();
 
 		//Consolidate information into tick container
 		TickInfo* tickInfo = new TickInfo( s_nCurrentTick, s_nCurrentRound, s_RoundStatus );
@@ -2213,6 +2233,8 @@ bool CDemoFileDump::ParseNextTick()
 		{			
 			tickInfo->AddPlayer(( *it ));
 		}
+		tickInfo->AddBomb( bomb );
+
 		s_TickInfos.push_back( tickInfo );
 	}
 	//Reset for the next tick
