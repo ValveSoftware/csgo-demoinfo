@@ -1,11 +1,22 @@
 #ifndef ENUMS_H
 #define ENUMS_H
 
+#define BOMB_TIMER_TICKS 2560
+#define SMOKE_TIMER_TICKS 1152
+#define MOLOTOV_TIMER_TICKS 448
+#define DECOY_TIMER_TICKS 960
+
 typedef enum
 {
 	ROUND_FREEZE, ROUND_REGULAR, ROUND_AFTER
 }
 RoundStatus;
+
+typedef enum
+{
+	BOMB_ON_PLAYER, BOMB_DROPPED, BOMB_PLANTED, BOMB_DEFUSED, BOMB_EXPLODED, BOMB_PRE_EXPLOSION
+}
+BombStatus;
 
 typedef enum 
 {
@@ -14,6 +25,12 @@ typedef enum
 	B_PICK_UP, B_DROP, B_EXPLODE
 }
 BombEvent;
+
+typedef enum
+{
+	G_MOLOTOV, G_SMOKE, G_FLASH, G_HE, G_DECOY
+}
+GrenadeType;
 
 typedef enum
 {

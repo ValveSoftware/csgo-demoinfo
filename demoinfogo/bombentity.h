@@ -11,32 +11,26 @@ public:
 	BombEntity( BombEntity* bomb );
 	~BombEntity();
 
+	void TickCleanUp( int tickDifference );
 	void RoundCleanUp();
 	void Print();
 	
 	float GetX();
 	float GetY();
 	float GetZ();
-	bool GetIsPlanted();
-	bool GetIsOnPlayer();
-	bool GetIsDetonated();
-	bool GetIsDefused();
+	int GetBombTimer();
+	BombStatus GetBombStatus();
 	void SetX( float x );
 	void SetY( float y );
 	void SetZ( float z );
-	void SetIsPlanted( bool isPlanted );
-	void SetIsOnPlayer( bool isOnPlayer );
-	void SetIsDetonated( bool isDetonated );
-	void SetIsDefused( bool isDefused );
+	void SetBombStatus( BombStatus bombStatus );
 
 private:	
 	float x;
 	float y;
 	float z;
-	bool isPlanted;
-	bool isOnPlayer;
-	bool isDetonated;
-	bool isDefused;
+	BombStatus bombStatus;
+	int bombTimer;
 };
 
 #endif

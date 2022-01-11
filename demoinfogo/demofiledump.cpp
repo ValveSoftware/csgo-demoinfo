@@ -61,9 +61,11 @@ extern bool g_bDumpNetMessages;
 static bool s_bMatchStartOccured = false;
 static int s_nCurrentRound = 1;
 static int s_nCurrentTick = 0;
+static int s_nPreviousTick = 0;
 static int s_nBots = 0;
 static RoundStatus s_RoundStatus;
 static std::vector< Player* > s_PlayerInstances;
+static std::vector< GrenadeEntity* > s_GrenadeEntities;
 static std::vector< TickInfo* > s_TickInfos;
 static BombEntity* bomb;
 
@@ -145,6 +147,21 @@ Player *CDemoFileDump::FindPlayerInstanceByGUID( int GUID )
 		}
 	}
 	return NULL;
+}
+
+//Sets grenades ready to remove
+//Mollies/Smokes/Decoys are set to remove based on networked event
+//Flashes and HEs are set to remove the tick after
+void CDemoFileDump::SetRemoveGrenadeEntity( int entityID )
+{
+	for ( std::vector< GrenadeEntity* >::iterator it = s_GrenadeEntities.begin(); it != s_GrenadeEntities.end(); ++it )
+	{			
+		if( ( *it )->GetEntityID() == entityID )
+		{
+			( *it )->SetReadyToRemove( true );
+			break;
+		}
+	}
 }
 
 const CSVCMsg_GameEventList::descriptor_t *CDemoFileDump::GetGameEventDescriptor( const CSVCMsg_GameEvent &msg, CDemoFileDump& Demo )
@@ -1096,6 +1113,7 @@ void PrintNetMessage< CNETMsg_Tick, net_Tick >( CDemoFileDump& Demo, const void 
 
 	if ( msg.ParseFromArray( parseBuffer, BufferSize ) )
 	{
+		s_nPreviousTick = s_nCurrentTick;
 		s_nCurrentTick = msg.tick();
 		printf("----- Parsing Tick %d -----\n", s_nCurrentTick);
 	}
@@ -1521,8 +1539,6 @@ void CDemoFileDump::GetPlayerInfo()
 
 /************************Game Event Handling************************/
 
-
-//TODO refactor this
 void CDemoFileDump::HandlePlayerConnection( const CSVCMsg_GameEvent &msg, const CSVCMsg_GameEventList::descriptor_t *pDescriptor, bool connection )
 {
 	int numKeys = msg.keys().size();
@@ -1661,7 +1677,6 @@ void CDemoFileDump::HandlePlayerConnection( const CSVCMsg_GameEvent &msg, const 
 	}
 }
 
-//Call this if planter gets killed as well
 void CDemoFileDump::HandleBombEvent( const CSVCMsg_GameEvent &msg, const CSVCMsg_GameEventList::descriptor_t *pDescriptor, BombEvent event )
 {
 	int userid = msg.keys( 0 ).val_short();
@@ -1702,8 +1717,7 @@ void CDemoFileDump::HandleBombEvent( const CSVCMsg_GameEvent &msg, const CSVCMsg
 				bomb->SetX( player->x );
 				bomb->SetY( player->y );
 				bomb->SetZ( player->z );
-				bomb->SetIsPlanted( true );
-				bomb->SetIsOnPlayer( false );
+				bomb->SetBombStatus( BOMB_PLANTED );
 				printf( "	----- Bomb has been planted on %d ------\n", bombsite );				
 			}
 			break;
@@ -1728,7 +1742,7 @@ void CDemoFileDump::HandleBombEvent( const CSVCMsg_GameEvent &msg, const CSVCMsg
 			{
 				action = "defuser at";
 				player->SetStatus( PLAYER_DEFAULT );
-				bomb->SetIsDefused( true );
+				bomb->SetBombStatus( BOMB_DEFUSED );
 				printf( "	----- Bomb defuse has been aborted on %d ------\n", bombsite );				
 			}
 			break;
@@ -1740,8 +1754,7 @@ void CDemoFileDump::HandleBombEvent( const CSVCMsg_GameEvent &msg, const CSVCMsg
 				bomb->SetX( player->x );
 				bomb->SetY( player->y );
 				bomb->SetZ( player->z );
-				bomb->SetIsPlanted( false );
-				bomb->SetIsOnPlayer( true );
+				bomb->SetBombStatus( BOMB_ON_PLAYER );
 				printf( "	----- Bomb has been picked up by %s -----\n", player->GetName().c_str() );
 			}
 			break;
@@ -1753,8 +1766,7 @@ void CDemoFileDump::HandleBombEvent( const CSVCMsg_GameEvent &msg, const CSVCMsg
 				bomb->SetX( player->x );
 				bomb->SetY( player->y );
 				bomb->SetZ( player->z );
-				bomb->SetIsPlanted( false );
-				bomb->SetIsOnPlayer( false );
+				bomb->SetBombStatus( BOMB_DROPPED );
 				printf( "	----- Bomb has been dropped by %s -----\n", player->GetName().c_str() );
 			}
 			break;
@@ -1762,7 +1774,7 @@ void CDemoFileDump::HandleBombEvent( const CSVCMsg_GameEvent &msg, const CSVCMsg
 		case B_EXPLODE:
 			{
 				action = "dropped at";
-				bomb->SetIsDetonated( true );
+				bomb->SetBombStatus( BOMB_EXPLODED );
 				printf( "	----- Bomb has exploded on %d -----\n", bombsite );
 			}
 			break;
@@ -1781,12 +1793,6 @@ void CDemoFileDump::HandleBombEvent( const CSVCMsg_GameEvent &msg, const CSVCMsg
 			printf("  	----- %s %s position: %f, %f, %f\n", player->GetName().c_str(), action, pXYProp->m_pPropValue->m_value.m_vector.x, pXYProp->m_pPropValue->m_value.m_vector.y, pZProp->m_pPropValue->m_value.m_float );
 		}
 	}
-	//TODO
-	//we have a field in the player struct for planting, defusing, find the player using the given userid
-	//abort/complete events will reset the field to neutral
-	//once the bomb has been planted successfully, we need to create a new bomb entity using the planter's coordinates
-	//subsequent ticks will continue to use these initial coordinates
-	//bomb explosion will use these coordinates, and remove the bomb entity
 }
 
 void CDemoFileDump::HandleGrenadeEvent( const CSVCMsg_GameEvent &msg, const CSVCMsg_GameEventList::descriptor_t *pDescriptor, GrenadeEvent event )
@@ -1814,79 +1820,86 @@ void CDemoFileDump::HandleGrenadeEvent( const CSVCMsg_GameEvent &msg, const CSVC
 
 	switch ( event )
 	{
-		//Add to array
 		case MOLOTOV_START:
 			{
-				printf( "	----- Molotov burning at %f, %f, %f. ------\n", x, y, z );
+				s_GrenadeEntities.push_back(new GrenadeEntity( G_MOLOTOV, x, y, z, entityID ) );
+				//printf( "	----- Molotov burning at %f, %f, %f. ------\n", x, y, z );
 			}
 			break;
 
-		//Remove from array
 		case MOLOTOV_EXPIRE:
 			{
-				printf( "	----- Molotov expired at %f, %f, %f. ------\n", x, y, z );
+				SetRemoveGrenadeEntity( entityID );
+				//printf( "	----- Molotov expired at %f, %f, %f. ------\n", x, y, z );
 			}
 			break;
 
-		//Remove from array
 		case MOLOTOV_EXTINGUISH:
 			{
-				printf( "	----- Molotov extinguished at %f, %f, %f. ------\n", x, y, z );
+				SetRemoveGrenadeEntity( entityID );
+				//printf( "	----- Molotov extinguished at %f, %f, %f. ------\n", x, y, z );
 			}
 			break;
 
-		//Add to array
 		case SMOKE_DETONATE:
 			{
-				printf( "	----- Smoke detonated at %f, %f, %f. Thrown by %s ------\n", x, y, z, planter->GetName().c_str() );		
+				s_GrenadeEntities.push_back(new GrenadeEntity( G_SMOKE, x, y, z, entityID ) );
+				//printf( "	----- Smoke detonated at %f, %f, %f. Thrown by %s ------\n", x, y, z, planter->GetName().c_str() );		
 			}
 			break;
 
-		//Remove from array
 		case SMOKE_EXPIRED:
 			{
-				printf( "	----- Smoke expired at %f, %f, %f. Thrown by %s ------\n", x, y, z, planter->GetName().c_str() );
+				SetRemoveGrenadeEntity( entityID );
+				//printf( "	----- Smoke expired at %f, %f, %f. Thrown by %s ------\n", x, y, z, planter->GetName().c_str() );
 			}
 			break;
 
 		case FLASH_DETONATE:
 			{
-				printf( "	----- Flashbang detonated at %f, %f, %f. Thrown by %s ------\n", x, y, z, planter->GetName().c_str() );	
+				s_GrenadeEntities.push_back(new GrenadeEntity( G_FLASH, x, y, z, entityID ) );
+				//printf( "	----- Flashbang detonated at %f, %f, %f. Thrown by %s ------\n", x, y, z, planter->GetName().c_str() );	
 			}
 			break;
 
 		case HE_DETONATE:
 			{
-				printf( "	----- HE detonated at %f, %f, %f. Thrown by %s ------\n", x, y, z, planter->GetName().c_str() );
+				s_GrenadeEntities.push_back(new GrenadeEntity( G_HE, x, y, z, entityID ) );
+				//printf( "	----- HE detonated at %f, %f, %f. Thrown by %s ------\n", x, y, z, planter->GetName().c_str() );
 			}
 			break;
 
-		//Add to remove
 		case DECOY_START:
 			{
-				printf( "	----- Decoy started at %f, %f, %f. Thrown by %s ------\n", x, y, z, planter->GetName().c_str() );
+				s_GrenadeEntities.push_back(new GrenadeEntity( G_DECOY, x, y, z, entityID ) );
+				//printf( "	----- Decoy started at %f, %f, %f. Thrown by %s ------\n", x, y, z, planter->GetName().c_str() );
 			}
 			break;
 
-		//Update in array
 		case DECOY_FIRE:
 			{
-				printf( "	----- Decoy fired at %f, %f, %f. Thrown by %s ------\n", x, y, z, planter->GetName().c_str() );
+				for ( std::vector< GrenadeEntity* >::iterator it = s_GrenadeEntities.begin(); it != s_GrenadeEntities.end(); ++it )
+				{			
+					if( ( *it )->GetEntityID() == entityID )
+					{
+						( *it )->SetDecoyFiring( true );
+						break;
+					}
+				}
+				//printf( "	----- Decoy fired at %f, %f, %f. Thrown by %s ------\n", x, y, z, planter->GetName().c_str() );
 			}
 			break;
 
-		//Remove from array
 		case DECOY_DETONATE:
-		{
-			printf( "	----- Decoy detonated at %f, %f, %f. Thrown by %s ------\n", x, y, z, planter->GetName().c_str() );
-		}
-		break;
+			{
+				SetRemoveGrenadeEntity( entityID );
+				//printf( "	----- Decoy detonated at %f, %f, %f. Thrown by %s ------\n", x, y, z, planter->GetName().c_str() );
+			}
+			break;
 
 		default:
 			break;
 	}
-
-	//TODO when removing/updating in array, access by matching entityid
 }
 
 void CDemoFileDump::HandleWeaponFire( const CSVCMsg_GameEvent &msg, const CSVCMsg_GameEventList::descriptor_t *pDescriptor )
@@ -2028,7 +2041,7 @@ void CDemoFileDump::HandlePlayerDeath( const CSVCMsg_GameEvent &msg, const CSVCM
 }
 
 //TODO more clean up
-void CDemoFileDump::HandleTickStart()
+void CDemoFileDump::TickCleanUp()
 {
 	for ( std::vector< Player* >::iterator it = s_PlayerInstances.begin(); it != s_PlayerInstances.end(); ++it )
 	{			
@@ -2036,6 +2049,22 @@ void CDemoFileDump::HandleTickStart()
 		{				
 			//Reset status
 			( *it )->TickCleanUp();
+		}
+	}
+	bomb->TickCleanUp( s_nCurrentTick - s_nPreviousTick );
+
+	for ( std::vector< GrenadeEntity* >::iterator it = s_GrenadeEntities.begin(); it != s_GrenadeEntities.end(); )
+	{
+		( *it )->TickCleanUp( s_nCurrentTick - s_nPreviousTick );
+
+		if ( ( *it )->GetReadyToRemove() )
+		{
+			delete *it;
+			s_GrenadeEntities.erase(it);
+		}
+		else
+		{
+			++it;
 		}
 	}
 }
@@ -2052,6 +2081,13 @@ void CDemoFileDump::HandleRoundCleanUp()
 		}
 	}
 	bomb->RoundCleanUp();
+
+	//Clear all grenades at round end
+	for ( std::vector< GrenadeEntity* >::iterator it = s_GrenadeEntities.begin(); it != s_GrenadeEntities.end(); ++it )
+	{			
+		delete *it;
+	}
+	s_GrenadeEntities.clear();
 }
 
 
@@ -2235,10 +2271,15 @@ bool CDemoFileDump::ParseNextTick()
 		}
 		tickInfo->AddBomb( bomb );
 
+		for ( std::vector< GrenadeEntity* >::iterator it = s_GrenadeEntities.begin(); it != s_GrenadeEntities.end(); ++it )
+		{			
+			tickInfo->AddGrenade(( *it ));
+		}
+
 		s_TickInfos.push_back( tickInfo );
 	}
 	//Reset for the next tick
-	HandleTickStart();
+	TickCleanUp();
 	printf( "----- End of Tick %d -----\n", s_nCurrentTick );
 
 	return b;

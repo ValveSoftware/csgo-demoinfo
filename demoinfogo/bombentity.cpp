@@ -5,10 +5,8 @@ BombEntity::BombEntity()
 	this->x = -1;
 	this->y = -1;
 	this->z = -1;
-	this->isPlanted = false;
-	this->isOnPlayer = true;
-	this->isDetonated = false;
-	this->isDefused = false;
+	this->bombStatus = BOMB_ON_PLAYER;
+	this->bombTimer = BOMB_TIMER_TICKS;
 }
 
 BombEntity::BombEntity( BombEntity* bomb )
@@ -16,10 +14,8 @@ BombEntity::BombEntity( BombEntity* bomb )
 	this->x = bomb->x;
 	this->y = bomb->y;
 	this->z = bomb->z;
-	this->isPlanted = bomb->isPlanted;
-	this->isOnPlayer = bomb->isOnPlayer;
-	this->isDetonated = bomb->isDetonated;
-	this->isDefused = bomb->isDefused;
+	this->bombStatus = bomb->bombStatus;
+	this->bombTimer = bomb->bombTimer;
 }
 
 BombEntity::~BombEntity()
@@ -27,42 +23,77 @@ BombEntity::~BombEntity()
 
 }
 
+void BombEntity::TickCleanUp( int tickDifference )
+{
+	if ( bombStatus == BOMB_PLANTED )
+	{
+		if ( bombTimer > 0 )
+		{
+			bombTimer -= tickDifference;
+		}
+		else
+		{
+			bombStatus = BOMB_PRE_EXPLOSION;
+		}
+	}
+}
+
 void BombEntity::RoundCleanUp()
 {
 	this->x = -1;
 	this->y = -1;
 	this->z = -1;
-	this->isPlanted = false;
-	this->isOnPlayer = true;
-	this->isDetonated = false;
-	this->isDefused = false;
+	this->bombStatus = BOMB_ON_PLAYER;
+	this->bombTimer = BOMB_TIMER_TICKS;
 }
 
 void BombEntity::Print()
-{
+{	
 	//We only care if it's on the map
-	if ( !isOnPlayer )
+	if ( bombStatus != BOMB_ON_PLAYER )
 	{
-		printf( "	----- Bomb Info:\n" );
-		printf( "		----- Location: %f, %f, %f\n", x, y, z );
-		if ( isPlanted )
-		{
-			if ( isDetonated )
+		printf( "	Bomb Info:\n" );
+		printf( "	----- Location: %f, %f, %f\n", x, y, z );
+	}
+	else
+	{
+		return;
+	}
+
+	switch ( bombStatus )
+	{
+		case BOMB_PLANTED:		
 			{
-				printf( "		----- Status: Exploded.\n" );
+				printf( "	----- Status: Planted: %d ticks left.\n", bombTimer );
 			}
-			else if ( isDefused )
+			break;
+
+		case BOMB_EXPLODED:		
 			{
-				printf( "		----- Status: Defused.\n" );
+				printf( "	----- Status: Exploded.\n" );
 			}
-			else{
-				printf( "		----- Status: Planted.\n" );
+			break;
+
+		case BOMB_PRE_EXPLOSION:		
+			{
+				printf( "	----- Status: About to explode, can't defuse.\n" );		
 			}
-		}
-		else
-		{
-			printf( "		----- Status: Dropped.\n" );
-		}
+			break;
+
+		case BOMB_DEFUSED:		
+			{
+				printf( "	----- Status: Defused.\n" );	
+			}
+			break;
+
+		case BOMB_DROPPED:		
+			{
+				printf( "	----- Status: Dropped.\n" );
+			}
+			break;
+
+		default:
+			break;
 	}
 }
 
@@ -81,24 +112,9 @@ float BombEntity::GetZ()
 	return this->z;
 }
 
-bool BombEntity::GetIsPlanted()
+int BombEntity::GetBombTimer()
 {
-	return this->isPlanted;
-}
-
-bool BombEntity::GetIsOnPlayer()
-{
-	return this->isOnPlayer;
-}
-
-bool BombEntity::GetIsDetonated()
-{
-	return this->isDetonated;
-}
-
-bool BombEntity::GetIsDefused()
-{
-	return this->isDefused;
+	return this->bombTimer;
 }
 
 void BombEntity::SetX( float x )
@@ -116,22 +132,7 @@ void BombEntity::SetZ( float z )
 	this->z = z;
 }
 
-void BombEntity::SetIsPlanted( bool isPlanted )
+void BombEntity::SetBombStatus( BombStatus bombStatus )
 {
-	this->isPlanted = isPlanted;
-}
-
-void BombEntity::SetIsOnPlayer( bool isOnPlayer )
-{
-	this->isOnPlayer = isOnPlayer;
-}
-
-void BombEntity::SetIsDetonated( bool isDetonated )
-{
-	this->isDetonated = isDetonated;
-}
-
-void BombEntity::SetIsDefused( bool isDefused )
-{
-	this->isDefused = isDefused;
+	this->bombStatus = bombStatus;
 }

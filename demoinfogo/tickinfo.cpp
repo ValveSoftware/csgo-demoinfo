@@ -24,9 +24,15 @@ void TickInfo::AddBomb( BombEntity* bomb )
 	this->bomb = BombEntity( bomb );
 }
 
+void TickInfo::AddGrenade( GrenadeEntity* grenade )
+{
+	GrenadeEntity addedGrenade = GrenadeEntity( grenade );
+	grenadesInTick.push_back( addedGrenade );
+}
+
 void TickInfo::Print()
 {
-	printf( "Tick %d Info: \n", tickNumber );
+	printf( "\nTick %d Info: \n", tickNumber );
 	printf( "	Round number: %d\n", roundNumber );
 	printf( "	Round status: %d\n", roundStatus );
 
@@ -39,5 +45,16 @@ void TickInfo::Print()
 		}
 		//( *it )->Print();
 	}
+
 	bomb.Print();
+
+	if ( grenadesInTick.size() > 0 )
+	{		
+		printf( "	Grenade Info:\n" );
+		for ( std::vector< GrenadeEntity >::iterator it = grenadesInTick.begin(); it != grenadesInTick.end(); ++it )
+		{			
+			( *it ).Print();
+		}
+	}
+
 }

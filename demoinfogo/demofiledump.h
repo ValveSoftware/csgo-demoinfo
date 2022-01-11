@@ -30,6 +30,7 @@
 #include "demofilepropdecode.h"
 #include "player.h"
 #include "bombentity.h"
+#include "grenadeentity.h"
 #include "tickinfo.h"
 #include "enums.h"
 
@@ -254,6 +255,7 @@ private:
 	void CleanUp();
 	Player *FindPlayerInstance( int internalID );
 	Player *FindPlayerInstanceByGUID( int GUID );
+	void SetRemoveGrenadeEntity( int entityID );
 	void HandlePlayerConnection( const CSVCMsg_GameEvent &msg, const CSVCMsg_GameEventList::descriptor_t *pDescriptor, bool connection );
 	void HandleBombEvent( const CSVCMsg_GameEvent &msg, const CSVCMsg_GameEventList::descriptor_t *pDescriptor, BombEvent event );
 	void HandleGrenadeEvent( const CSVCMsg_GameEvent &msg, const CSVCMsg_GameEventList::descriptor_t *pDescriptor, GrenadeEvent event );
@@ -261,7 +263,7 @@ private:
 	void HandlePlayerBlind( const CSVCMsg_GameEvent &msg, const CSVCMsg_GameEventList::descriptor_t *pDescriptor );
 	void HandlePlayerHurt( const CSVCMsg_GameEvent &msg, const CSVCMsg_GameEventList::descriptor_t *pDescriptor );
 	void HandlePlayerDeath( const CSVCMsg_GameEvent &msg, const CSVCMsg_GameEventList::descriptor_t *pDescriptor );
-	void HandleTickStart();
+	void TickCleanUp();
 	void HandleRoundCleanUp();
 
 	void GetPlayerInfo();

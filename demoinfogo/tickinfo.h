@@ -4,6 +4,7 @@
 #include "enums.h"
 #include "player.h"
 #include "bombentity.h"
+#include "grenadeentity.h"
 #include <vector>
 
 class TickInfo
@@ -14,6 +15,7 @@ public:
 
 	void AddPlayer( Player* player );
 	void AddBomb( BombEntity* bomb );
+	void AddGrenade( GrenadeEntity* grenade );
 	void Print();
 
 private:
@@ -22,6 +24,7 @@ private:
 	RoundStatus roundStatus;
 	std::vector< Player > playersInTick;
 	BombEntity bomb;
+	std::vector< GrenadeEntity > grenadesInTick;
 };
 
 #endif
