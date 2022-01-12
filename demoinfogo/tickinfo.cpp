@@ -30,6 +30,18 @@ void TickInfo::AddGrenade( GrenadeEntity* grenade )
 	grenadesInTick.push_back( addedGrenade );
 }
 
+void TickInfo::AddPlayerHurt( PlayerHurtEvent* playerHurt )
+{
+	PlayerHurtEvent addedPlayerHurt = PlayerHurtEvent( playerHurt );
+	hurtEventsInTick.push_back( addedPlayerHurt );
+}
+
+void TickInfo::AddPlayerDeath( PlayerDeathEvent* playerDeath )
+{
+	PlayerDeathEvent addedPlayerDeath = PlayerDeathEvent( playerDeath );
+	deathEventsInTick.push_back( addedPlayerDeath );
+}
+
 void TickInfo::Print()
 {
 	printf( "\nTick %d Info: \n", tickNumber );
@@ -57,4 +69,21 @@ void TickInfo::Print()
 		}
 	}
 
+	if ( hurtEventsInTick.size() > 0 )
+	{
+		printf( "	Hurt Info:\n" );
+		for ( std::vector< PlayerHurtEvent >::iterator it = hurtEventsInTick.begin(); it != hurtEventsInTick.end(); ++it )
+		{
+			( *it ).Print();
+		}
+	}
+
+	if ( deathEventsInTick.size() > 0 )
+	{
+		printf( "	Death Info:\n" );
+		for ( std::vector< PlayerDeathEvent >::iterator it = deathEventsInTick.begin(); it != deathEventsInTick.end(); ++it )
+		{
+			( *it ).Print();
+		}
+	}
 }

@@ -58,6 +58,7 @@ extern bool g_bDumpDataTables;
 extern bool g_bDumpPacketEntities;
 extern bool g_bDumpNetMessages;
 
+//TODO make these not static lmao
 static bool s_bMatchStartOccured = false;
 static int s_nCurrentRound = 1;
 static int s_nCurrentTick = 0;
@@ -66,6 +67,8 @@ static int s_nBots = 0;
 static RoundStatus s_RoundStatus;
 static std::vector< Player* > s_PlayerInstances;
 static std::vector< GrenadeEntity* > s_GrenadeEntities;
+static std::vector< PlayerHurtEvent* > s_PlayerHurtEvents;
+static std::vector< PlayerDeathEvent* > s_PlayerDeathEvents;
 static std::vector< TickInfo* > s_TickInfos;
 static BombEntity* bomb;
 
@@ -1115,7 +1118,7 @@ void PrintNetMessage< CNETMsg_Tick, net_Tick >( CDemoFileDump& Demo, const void 
 	{
 		s_nPreviousTick = s_nCurrentTick;
 		s_nCurrentTick = msg.tick();
-		printf("----- Parsing Tick %d -----\n", s_nCurrentTick);
+		//printf("----- Parsing Tick %d -----\n", s_nCurrentTick);
 	}
 }
 
@@ -1594,13 +1597,13 @@ void CDemoFileDump::HandlePlayerConnection( const CSVCMsg_GameEvent &msg, const 
 			//New player connecting
 			if ( !connectingPlayer )
 			{			
-				printf("	----- Player %d %s (id:%d) connected. EntityID: %d \n", GUID, name, userid, index + 1);
+				//printf("	----- Player %d %s (id:%d) connected. EntityID: %d \n", GUID, name, userid, index + 1);
 				s_PlayerInstances.push_back( new Player( GUID, index, userid, name, bBot ) );
 			}
 			//Existing playing reconnected
 			else
 			{			
-				printf("	----- Player %d %s (id:%d) reconnected. EntityID: %d \n", GUID, name, userid, index + 1);
+				//printf("	----- Player %d %s (id:%d) reconnected. EntityID: %d \n", GUID, name, userid, index + 1);
 				//Once a player reconnects they get a new userID and entityID? thanks volvo
 				connectingPlayer->userID = userid;
 				connectingPlayer->entityID = index;
@@ -1631,7 +1634,7 @@ void CDemoFileDump::HandlePlayerConnection( const CSVCMsg_GameEvent &msg, const 
 			else
 			{
 				//idk if a bot can reconnect but here it is
-				printf("	----- Bot %d %s (id:%d) reconnected. EntityID: %d \n", connectingBot->GetGUID(), name, userid, index + 1);
+				//printf("	----- Bot %d %s (id:%d) reconnected. EntityID: %d \n", connectingBot->GetGUID(), name, userid, index + 1);
 				connectingBot->userID = userid;
 				connectingBot->entityID = index;
 				connectingBot->SetIsConnected( true );
@@ -1647,9 +1650,8 @@ void CDemoFileDump::HandlePlayerConnection( const CSVCMsg_GameEvent &msg, const 
 			//If this fails to find, we have a problem lmao
 			if ( disconnectingPlayer )
 			{
-				printf("	----- Player %d %s (id:%d) disconnected. EntityID: %d. Reason: %s\n", GUID, name, userid, disconnectingPlayer->entityID, reason);
+				//printf("	----- Player %d %s (id:%d) disconnected. EntityID: %d. Reason: %s\n", GUID, name, userid, disconnectingPlayer->entityID, reason);
 				disconnectingPlayer->SetIsConnected( false );
-				disconnectingPlayer->userID = -1;
 				disconnectingPlayer->entityID = -1;
 				disconnectingPlayer->SetStatus( PLAYER_DEFAULT );	
 			}
@@ -1667,9 +1669,8 @@ void CDemoFileDump::HandlePlayerConnection( const CSVCMsg_GameEvent &msg, const 
 			}		
 			if ( disconnectingBot )
 			{
-				printf("	----- Bot %d %s (id:%d) disconnected. EntityID: %d. Reason: %s\n", disconnectingBot->GetGUID(), name, userid, disconnectingBot->entityID, reason);
+				//printf("	----- Bot %d %s (id:%d) disconnected. EntityID: %d. Reason: %s\n", disconnectingBot->GetGUID(), name, userid, disconnectingBot->entityID, reason);
 				disconnectingBot->SetIsConnected( false );
-				disconnectingBot->userID = -1;
 				disconnectingBot->entityID = -1;
 				disconnectingBot->SetStatus( PLAYER_DEFAULT );	
 			}
@@ -1697,7 +1698,7 @@ void CDemoFileDump::HandleBombEvent( const CSVCMsg_GameEvent &msg, const CSVCMsg
 			{
 				action = "planter at";
 				player->SetStatus( PLAYER_PLANTING );
-				printf( "	----- Bomb planting on %d ------\n", bombsite );
+				//printf( "	----- Bomb planting on %d ------\n", bombsite );
 			}
 			break;
 
@@ -1705,7 +1706,7 @@ void CDemoFileDump::HandleBombEvent( const CSVCMsg_GameEvent &msg, const CSVCMsg
 			{
 				action = "planter at";
 				player->SetStatus( PLAYER_DEFAULT );
-				printf( "	----- Bomb plant has been aborted on %d ------\n", bombsite );
+				//printf( "	----- Bomb plant has been aborted on %d ------\n", bombsite );
 			}
 			break;
 
@@ -1718,7 +1719,7 @@ void CDemoFileDump::HandleBombEvent( const CSVCMsg_GameEvent &msg, const CSVCMsg
 				bomb->SetY( player->y );
 				bomb->SetZ( player->z );
 				bomb->SetBombStatus( BOMB_PLANTED );
-				printf( "	----- Bomb has been planted on %d ------\n", bombsite );				
+				//printf( "	----- Bomb has been planted on %d ------\n", bombsite );				
 			}
 			break;
 
@@ -1726,7 +1727,7 @@ void CDemoFileDump::HandleBombEvent( const CSVCMsg_GameEvent &msg, const CSVCMsg
 			{
 				action = "defuser at";
 				player->SetStatus( PLAYER_DEFUSING );
-				printf( "	----- Bomb defusing on %d ------\n", bombsite );
+				//printf( "	----- Bomb defusing on %d ------\n", bombsite );
 			}
 			break;
 
@@ -1734,7 +1735,7 @@ void CDemoFileDump::HandleBombEvent( const CSVCMsg_GameEvent &msg, const CSVCMsg
 			{
 				action = "defuser at";
 				player->SetStatus( PLAYER_DEFAULT );
-				printf( "	----- Bomb has been defused on %d ------\n", bombsite );				
+				//printf( "	----- Bomb has been defused on %d ------\n", bombsite );				
 			}
 			break;
 
@@ -1743,7 +1744,7 @@ void CDemoFileDump::HandleBombEvent( const CSVCMsg_GameEvent &msg, const CSVCMsg
 				action = "defuser at";
 				player->SetStatus( PLAYER_DEFAULT );
 				bomb->SetBombStatus( BOMB_DEFUSED );
-				printf( "	----- Bomb defuse has been aborted on %d ------\n", bombsite );				
+				//printf( "	----- Bomb defuse has been aborted on %d ------\n", bombsite );				
 			}
 			break;
 
@@ -1755,7 +1756,7 @@ void CDemoFileDump::HandleBombEvent( const CSVCMsg_GameEvent &msg, const CSVCMsg
 				bomb->SetY( player->y );
 				bomb->SetZ( player->z );
 				bomb->SetBombStatus( BOMB_ON_PLAYER );
-				printf( "	----- Bomb has been picked up by %s -----\n", player->GetName().c_str() );
+				//printf( "	----- Bomb has been picked up by %s -----\n", player->GetName().c_str() );
 			}
 			break;
 
@@ -1767,7 +1768,7 @@ void CDemoFileDump::HandleBombEvent( const CSVCMsg_GameEvent &msg, const CSVCMsg
 				bomb->SetY( player->y );
 				bomb->SetZ( player->z );
 				bomb->SetBombStatus( BOMB_DROPPED );
-				printf( "	----- Bomb has been dropped by %s -----\n", player->GetName().c_str() );
+				//printf( "	----- Bomb has been dropped by %s -----\n", player->GetName().c_str() );
 			}
 			break;
 
@@ -1775,7 +1776,7 @@ void CDemoFileDump::HandleBombEvent( const CSVCMsg_GameEvent &msg, const CSVCMsg
 			{
 				action = "dropped at";
 				bomb->SetBombStatus( BOMB_EXPLODED );
-				printf( "	----- Bomb has exploded on %d -----\n", bombsite );
+				//printf( "	----- Bomb has exploded on %d -----\n", bombsite );
 			}
 			break;
 
@@ -1790,7 +1791,7 @@ void CDemoFileDump::HandleBombEvent( const CSVCMsg_GameEvent &msg, const CSVCMsg
 		PropEntry* pZProp = pEntity->FindProp( "m_vecOrigin[2]" );
 		if ( pXYProp && pZProp )
 		{			
-			printf("  	----- %s %s position: %f, %f, %f\n", player->GetName().c_str(), action, pXYProp->m_pPropValue->m_value.m_vector.x, pXYProp->m_pPropValue->m_value.m_vector.y, pZProp->m_pPropValue->m_value.m_float );
+			//printf("  	----- %s %s position: %f, %f, %f\n", player->GetName().c_str(), action, pXYProp->m_pPropValue->m_value.m_vector.x, pXYProp->m_pPropValue->m_value.m_vector.y, pZProp->m_pPropValue->m_value.m_float );
 		}
 	}
 }
@@ -1908,8 +1909,9 @@ void CDemoFileDump::HandleWeaponFire( const CSVCMsg_GameEvent &msg, const CSVCMs
 	const char *weapon = msg.keys( 1 ).val_string().c_str();
 	Player* player = FindPlayerInstance( userid );
 
-	printf( "	----- %s fired weapon %s. -----\n", player->GetName().c_str(), weapon );
 	player->SetStatus( PLAYER_FIRING );
+	
+	/*printf( "	----- %s fired weapon %s. -----\n", player->GetName().c_str(), weapon );
 
 	//Probing active weapon id
 	EntityEntry *pEntity = FindEntity( player->entityID + 1 );
@@ -1918,9 +1920,10 @@ void CDemoFileDump::HandleWeaponFire( const CSVCMsg_GameEvent &msg, const CSVCMs
 	int max = 11;
 	int mask = ( ( 1 << max ) - 1 );
 	test = pActiveWeapon->m_pPropValue->m_value.m_int & mask;
-	printf( "%d\n", test );
+	printf( "%d\n", test );*/
 
 	//TODO add weapon fire event to event array
+	//is this necessary? player entities already have a field when they are firing
 }
 
 void CDemoFileDump::HandlePlayerBlind( const CSVCMsg_GameEvent &msg, const CSVCMsg_GameEventList::descriptor_t *pDescriptor )
@@ -1938,19 +1941,26 @@ void CDemoFileDump::HandlePlayerBlind( const CSVCMsg_GameEvent &msg, const CSVCM
 	//Sometimes finds gotv by accident??
 	if ( player && attacker )
 	{
-		printf( "	----- Player %s flashed by %s for %f seconds. -----\n", player->GetName().c_str(), attacker->GetName().c_str(), blindDuration );
+		//printf( "	----- Player %s flashed by %s for %f seconds. -----\n", player->GetName().c_str(), attacker->GetName().c_str(), blindDuration );
 	}
 	
 	//TODO add to event array
+	//is this necessary? player entities already have a field when they are blind
 }
 
 void CDemoFileDump::HandlePlayerHurt( const CSVCMsg_GameEvent &msg, const CSVCMsg_GameEventList::descriptor_t *pDescriptor )
 {
 	int userid = msg.keys( 0 ).val_short();
 	Player* player = FindPlayerInstance( userid );
+	int playerGUID = player->GetGUID();
 
 	int attackerid = msg.keys( 1 ).val_short();
 	Player* attacker = FindPlayerInstance( attackerid );
+	int attackerGUID = -404;
+	if ( attacker )
+	{
+		attackerGUID = attacker->GetGUID();
+	}
 
 	int health = msg.keys( 2 ).val_byte();
 	int armour = msg.keys( 3 ).val_byte();
@@ -1959,7 +1969,9 @@ void CDemoFileDump::HandlePlayerHurt( const CSVCMsg_GameEvent &msg, const CSVCMs
 	int armourDamage = msg.keys( 6 ).val_byte();
 	int hitgroup = msg.keys( 7 ).val_byte();
 
-	if ( attacker )
+	s_PlayerHurtEvents.push_back( new PlayerHurtEvent( playerGUID, attackerGUID, healthDamage, armourDamage, weapon, hitgroup ) );
+
+	/*if ( attacker )
 	{
 		printf( "	----- Player %s hurt for %d damage (%d armour) by %s (weapon: %s, hitgroup: %d). -----\n", player->GetName().c_str(), healthDamage, armourDamage, attacker->GetName().c_str(), weapon, hitgroup );
 	}
@@ -1967,21 +1979,30 @@ void CDemoFileDump::HandlePlayerHurt( const CSVCMsg_GameEvent &msg, const CSVCMs
 	{
 		printf( "	----- Player %s hurt for %d damage (%d armour) by world. -----\n", player->GetName().c_str(), healthDamage, armourDamage );
 	}
-	printf( "		----- Remaining health: %d, remaining armour: %d\n", health, armour );
-
-	//TODO add to event array/player state
+	printf( "		----- Remaining health: %d, remaining armour: %d\n", health, armour );*/
 }
 
 void CDemoFileDump::HandlePlayerDeath( const CSVCMsg_GameEvent &msg, const CSVCMsg_GameEventList::descriptor_t *pDescriptor )
 {
 	int userid = msg.keys( 0 ).val_short();
 	Player* player = FindPlayerInstance( userid );
+	int playerGUID = player->GetGUID();
 
 	int attackerid = msg.keys( 1 ).val_short();	
 	Player* attacker = FindPlayerInstance( attackerid );
+	int attackerGUID = -404;
+	if ( attacker )
+	{
+		attackerGUID = attacker->GetGUID();
+	}
 
 	int assisterid = msg.keys( 2 ).val_short();	
 	Player* assister = FindPlayerInstance( assisterid );
+	int assisterGUID = -404;
+	if ( assister )
+	{
+		assisterGUID = assister->GetGUID();
+	}
 
 	bool assistedFlash = msg.keys( 3 ).val_bool();
 	const char *weaponName = msg.keys( 4 ).val_string().c_str();
@@ -1991,7 +2012,9 @@ void CDemoFileDump::HandlePlayerDeath( const CSVCMsg_GameEvent &msg, const CSVCM
 	bool whileBlind = msg.keys( 16 ).val_bool();
 	float distance = msg.keys( 17 ).val_float();
 
-	if ( player )
+	s_PlayerDeathEvents.push_back( new PlayerDeathEvent( playerGUID, attackerGUID, assisterGUID, assistedFlash, weaponName, headshot, wallbang, throughSmoke, whileBlind, distance ) );
+
+	/*if ( player )
 	{
 		if ( attacker )
 		{
@@ -2035,9 +2058,7 @@ void CDemoFileDump::HandlePlayerDeath( const CSVCMsg_GameEvent &msg, const CSVCM
 	else
 	{
 		printf( "	----- Player %d died to disconnection. -----\n", userid );
-	}
-
-	//TODO add to event array	
+	}*/
 }
 
 //TODO more clean up
@@ -2067,6 +2088,20 @@ void CDemoFileDump::TickCleanUp()
 			++it;
 		}
 	}
+
+	//Hurt events exist for the single tick and are cleared afterwards
+	for ( std::vector< PlayerHurtEvent* >::iterator it = s_PlayerHurtEvents.begin(); it != s_PlayerHurtEvents.end(); ++it )
+	{
+		delete *it;
+	}
+	s_PlayerHurtEvents.clear();
+
+	//Deaths events exist for the single tick and are cleared afterwards
+	for ( std::vector< PlayerDeathEvent* >::iterator it = s_PlayerDeathEvents.begin(); it != s_PlayerDeathEvents.end(); ++it )
+	{
+		delete *it;
+	}
+	s_PlayerDeathEvents.clear();
 }
 
 //TODO more cleanup
@@ -2267,20 +2302,30 @@ bool CDemoFileDump::ParseNextTick()
 		TickInfo* tickInfo = new TickInfo( s_nCurrentTick, s_nCurrentRound, s_RoundStatus );
 		for ( std::vector< Player* >::iterator it = s_PlayerInstances.begin(); it != s_PlayerInstances.end(); ++it )
 		{			
-			tickInfo->AddPlayer(( *it ));
+			tickInfo->AddPlayer( ( *it ) );
 		}
 		tickInfo->AddBomb( bomb );
 
 		for ( std::vector< GrenadeEntity* >::iterator it = s_GrenadeEntities.begin(); it != s_GrenadeEntities.end(); ++it )
 		{			
-			tickInfo->AddGrenade(( *it ));
+			tickInfo->AddGrenade( ( *it ) );
+		}
+
+		for ( std::vector< PlayerHurtEvent* >::iterator it = s_PlayerHurtEvents.begin(); it != s_PlayerHurtEvents.end(); ++it )
+		{
+			tickInfo->AddPlayerHurt( ( *it ) );
+		}
+
+		for ( std::vector< PlayerDeathEvent* >::iterator it = s_PlayerDeathEvents.begin(); it != s_PlayerDeathEvents.end(); ++it )
+		{
+			tickInfo->AddPlayerDeath( ( *it ) );
 		}
 
 		s_TickInfos.push_back( tickInfo );
 	}
 	//Reset for the next tick
 	TickCleanUp();
-	printf( "----- End of Tick %d -----\n", s_nCurrentTick );
+	//printf( "----- End of Tick %d -----\n", s_nCurrentTick );
 
 	return b;
 }

@@ -31,6 +31,7 @@
 #include "player.h"
 #include "bombentity.h"
 #include "grenadeentity.h"
+#include "playerdeathevent.h";
 #include "tickinfo.h"
 #include "enums.h"
 

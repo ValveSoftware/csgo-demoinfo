@@ -126,6 +126,8 @@ protoc-2.5.0-win32\protoc.exe --proto_path=.\protobuf-2.5.0\src --proto_path=. -
     <ClCompile Include="generated_proto\netmessages_public.pb.cc" />
     <ClCompile Include="grenadeentity.cpp" />
     <ClCompile Include="player.cpp" />
+    <ClCompile Include="playerdeathevent.cpp" />
+    <ClCompile Include="playerhurtevent.cpp" />
     <ClCompile Include="tickinfo.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -139,6 +141,8 @@ protoc-2.5.0-win32\protoc.exe --proto_path=.\protobuf-2.5.0\src --proto_path=. -
     <ClInclude Include="generated_proto\netmessages_public.pb.h" />
     <ClInclude Include="grenadeentity.h" />
     <ClInclude Include="player.h" />
+    <ClInclude Include="playerdeathevent.h" />
+    <ClInclude Include="playerhurtevent.h" />
     <ClInclude Include="tickinfo.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

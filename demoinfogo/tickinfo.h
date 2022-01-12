@@ -5,6 +5,8 @@
 #include "player.h"
 #include "bombentity.h"
 #include "grenadeentity.h"
+#include "playerhurtevent.h"
+#include "playerdeathevent.h"
 #include <vector>
 
 class TickInfo
@@ -16,6 +18,8 @@ public:
 	void AddPlayer( Player* player );
 	void AddBomb( BombEntity* bomb );
 	void AddGrenade( GrenadeEntity* grenade );
+	void AddPlayerHurt( PlayerHurtEvent* playerHurt );
+	void AddPlayerDeath( PlayerDeathEvent* playerDeath );
 	void Print();
 
 private:
@@ -25,6 +29,8 @@ private:
 	std::vector< Player > playersInTick;
 	BombEntity bomb;
 	std::vector< GrenadeEntity > grenadesInTick;
+	std::vector< PlayerHurtEvent > hurtEventsInTick;
+	std::vector< PlayerDeathEvent > deathEventsInTick;
 };
 
 #endif
