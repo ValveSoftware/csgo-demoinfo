@@ -9,9 +9,13 @@
 #include "playerdeathevent.h"
 #include <vector>
 
+#include "json.hpp"
+using json = nlohmann::json;
+
 class TickInfo
 {
 public:
+	TickInfo();
 	TickInfo( int tickNumber, int roundNumber, RoundStatus roundStatus );
 	~TickInfo();
 
@@ -21,6 +25,9 @@ public:
 	void AddPlayerHurt( PlayerHurtEvent* playerHurt );
 	void AddPlayerDeath( PlayerDeathEvent* playerDeath );
 	void Print();
+	size_t SizeTest();
+
+	NLOHMANN_DEFINE_TYPE_INTRUSIVE( TickInfo, tickNumber, roundNumber, roundStatus, playersInTick, bomb, grenadesInTick, hurtEventsInTick, deathEventsInTick );
 
 private:
 	int tickNumber;

@@ -25,13 +25,15 @@
 #ifndef DEMOFILEDUMP_H
 #define DEMOFILEDUMP_H
 
+#include <iostream>
+#include <string>
 #include "demofile.h"
 #include "demofilebitbuf.h"
 #include "demofilepropdecode.h"
 #include "player.h"
 #include "bombentity.h"
 #include "grenadeentity.h"
-#include "playerdeathevent.h";
+#include "playerdeathevent.h"
 #include "tickinfo.h"
 #include "enums.h"
 

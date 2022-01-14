@@ -5,13 +5,13 @@
 #include <stdio.h>
 #include <string>
 
+#include "json.hpp"
+using json = nlohmann::json;
+
 class Player
 {
 public:
-	/*Player( int entityID, int userID, const char* name, int teamID, 
-		float x, float y, float z, float eyePitch, float eyeYaw, 
-		int health, int armour, bool hasHelmet, bool hasDefuseKit,
-		int money, float flashDuration );*/
+	Player();
 	Player( int GUID, int entityID, int userID, std::string name, bool isBot );
 	Player( Player* player );
 	~Player();
@@ -68,6 +68,8 @@ public:
 	//int killsCurrentRound;
 	//weapons
 	//headshots, damage, util damage, flashes?
+
+	NLOHMANN_DEFINE_TYPE_INTRUSIVE( Player, GUID, isConnected, isBot, entityID, userID, name, teamID, x, y, z, eyePitch, eyeYaw, health, armour, hasHelmet, hasDefuseKit, money, flashDuration, status, hasBomb );
 
 private:
 	int GUID;

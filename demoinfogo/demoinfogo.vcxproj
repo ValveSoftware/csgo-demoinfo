@@ -73,6 +73,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>_SCL_SECURE_NO_WARNINGS;WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>protobuf-2.5.0\src\</AdditionalIncludeDirectories>
+      <LanguageStandard>Default</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -140,6 +141,7 @@ protoc-2.5.0-win32\protoc.exe --proto_path=.\protobuf-2.5.0\src --proto_path=. -
     <ClInclude Include="generated_proto\cstrike15_usermessages_public.pb.h" />
     <ClInclude Include="generated_proto\netmessages_public.pb.h" />
     <ClInclude Include="grenadeentity.h" />
+    <ClInclude Include="json.hpp" />
     <ClInclude Include="player.h" />
     <ClInclude Include="playerdeathevent.h" />
     <ClInclude Include="playerhurtevent.h" />

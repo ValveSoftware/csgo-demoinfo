@@ -24,6 +24,7 @@
 
 #include <stdarg.h>
 #include <iostream>
+#include <fstream>
 #include <string>  
 #include <conio.h>
 #include "demofile.h"
@@ -69,7 +70,7 @@ static std::vector< Player* > s_PlayerInstances;
 static std::vector< GrenadeEntity* > s_GrenadeEntities;
 static std::vector< PlayerHurtEvent* > s_PlayerHurtEvents;
 static std::vector< PlayerDeathEvent* > s_PlayerDeathEvents;
-static std::vector< TickInfo* > s_TickInfos;
+static std::vector< TickInfo > s_TickInfos;
 static BombEntity* bomb;
 
 __declspec( noreturn ) void fatal_errorf( const char* fmt, ... )
@@ -108,10 +109,10 @@ void CDemoFileDump::CleanUp()
 	}
 	s_PlayerInstances.clear();
 
-	for ( std::vector< TickInfo* >::iterator it = s_TickInfos.begin(); it != s_TickInfos.end(); ++it )
+	/*for ( std::vector< TickInfo >::iterator it = s_TickInfos.begin(); it != s_TickInfos.end(); ++it )
 	{			
 		delete *it;
-	}
+	}*/
 	s_TickInfos.clear();
 
 	delete bomb;
@@ -1911,16 +1912,28 @@ void CDemoFileDump::HandleWeaponFire( const CSVCMsg_GameEvent &msg, const CSVCMs
 
 	player->SetStatus( PLAYER_FIRING );
 	
-	/*printf( "	----- %s fired weapon %s. -----\n", player->GetName().c_str(), weapon );
+	printf( "	----- %s fired weapon %s. -----\n", player->GetName().c_str(), weapon );
 
-	//Probing active weapon id
+	/*//Probing active weapon id
 	EntityEntry *pEntity = FindEntity( player->entityID + 1 );
 	PropEntry *pActiveWeapon = pEntity->FindProp( "m_hActiveWeapon" );
 	int test;
 	int max = 11;
 	int mask = ( ( 1 << max ) - 1 );
 	test = pActiveWeapon->m_pPropValue->m_value.m_int & mask;
-	printf( "%d\n", test );*/
+	printf( "%d\n", test );
+
+	EntityEntry *pGun = FindEntity( test );
+	if( test )
+	{
+		printf("found pgun\n");
+		for (int i = 0; i < pGun->m_props.size(); i++)
+		{
+			//std::cout << pGun->m_props.at(i)->m_pFlattenedProp->m_arrayElementProp->DebugString() << std::endl;
+			//std::cout << name << std::endl;
+			std::cout << pGun->m_props.at(i)->m_pPropValue->m_type << std::endl;
+		}
+	}*/
 
 	//TODO add weapon fire event to event array
 	//is this necessary? player entities already have a field when they are firing
@@ -2284,10 +2297,15 @@ void CDemoFileDump::ParseToEnd()
 	{
 
 	}
-	for ( std::vector< TickInfo* >::iterator it = s_TickInfos.begin(); it != s_TickInfos.end(); ++it )
+	for ( std::vector< TickInfo >::iterator it = s_TickInfos.begin(); it != s_TickInfos.end(); ++it )
 	{			
-		( *it )->Print();
+		it->Print();
 	}
+
+	std::ofstream file("output.json");
+	json jOutput = s_TickInfos;
+	file<<std::setw(4)<<jOutput<<std::endl;
+
 	CleanUp();
 }
 
@@ -2299,26 +2317,26 @@ bool CDemoFileDump::ParseNextTick()
 		GetPlayerInfo();
 
 		//Consolidate information into tick container
-		TickInfo* tickInfo = new TickInfo( s_nCurrentTick, s_nCurrentRound, s_RoundStatus );
+		TickInfo tickInfo = TickInfo( s_nCurrentTick, s_nCurrentRound, s_RoundStatus );
 		for ( std::vector< Player* >::iterator it = s_PlayerInstances.begin(); it != s_PlayerInstances.end(); ++it )
 		{			
-			tickInfo->AddPlayer( ( *it ) );
+			tickInfo.AddPlayer( ( *it ) );
 		}
-		tickInfo->AddBomb( bomb );
+		tickInfo.AddBomb( bomb );
 
 		for ( std::vector< GrenadeEntity* >::iterator it = s_GrenadeEntities.begin(); it != s_GrenadeEntities.end(); ++it )
 		{			
-			tickInfo->AddGrenade( ( *it ) );
+			tickInfo.AddGrenade( ( *it ) );
 		}
 
 		for ( std::vector< PlayerHurtEvent* >::iterator it = s_PlayerHurtEvents.begin(); it != s_PlayerHurtEvents.end(); ++it )
 		{
-			tickInfo->AddPlayerHurt( ( *it ) );
+			tickInfo.AddPlayerHurt( ( *it ) );
 		}
 
 		for ( std::vector< PlayerDeathEvent* >::iterator it = s_PlayerDeathEvents.begin(); it != s_PlayerDeathEvents.end(); ++it )
 		{
-			tickInfo->AddPlayerDeath( ( *it ) );
+			tickInfo.AddPlayerDeath( ( *it ) );
 		}
 
 		s_TickInfos.push_back( tickInfo );

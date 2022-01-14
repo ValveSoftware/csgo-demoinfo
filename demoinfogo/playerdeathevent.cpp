@@ -1,5 +1,10 @@
 #include "playerdeathevent.h"
 
+PlayerDeathEvent::PlayerDeathEvent()
+{
+	
+}
+
 PlayerDeathEvent::PlayerDeathEvent( int playerGUID, int attackerGUID, int assisterGUID, bool assistedFlash, std::string weaponName, bool headshot, bool wallbang, bool throughSmoke, bool whileBlind, float distance )
 {
 	this->playerGUID = playerGUID;

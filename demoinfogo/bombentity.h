@@ -4,6 +4,9 @@
 #include "enums.h"
 #include <stdio.h>
 
+#include "json.hpp"
+using json = nlohmann::json;
+
 class BombEntity
 {
 public:
@@ -24,6 +27,8 @@ public:
 	void SetY( float y );
 	void SetZ( float z );
 	void SetBombStatus( BombStatus bombStatus );
+
+	NLOHMANN_DEFINE_TYPE_INTRUSIVE( BombEntity, x, y, z, bombStatus, bombTimer );
 
 private:	
 	float x;

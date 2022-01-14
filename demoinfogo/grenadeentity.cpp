@@ -1,5 +1,10 @@
 #include "grenadeentity.h"
 
+GrenadeEntity::GrenadeEntity()
+{
+	
+}
+
 //TODO can add thrower and thrower origin maybe
 GrenadeEntity::GrenadeEntity( GrenadeType grenadeType, float x, float y, float z, int entityID )
 {

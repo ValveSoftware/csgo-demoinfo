@@ -1,5 +1,10 @@
 #include "playerhurtevent.h"
 
+PlayerHurtEvent::PlayerHurtEvent()
+{
+
+}
+
 PlayerHurtEvent::PlayerHurtEvent( int playerGUID, int attackerGUID, int healthDamage, int armourDamage, std::string weaponName, int hitgroup )
 {
 	this->playerGUID = playerGUID;

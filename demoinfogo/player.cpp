@@ -1,6 +1,11 @@
 #include "player.h"
 #include <stdio.h>
 
+Player::Player()
+{
+	
+}
+
 Player::Player( int GUID, int entityID, int userID, std::string name, bool isBot )
 {
 	this->GUID = GUID;

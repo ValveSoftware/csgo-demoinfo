@@ -1,6 +1,8 @@
 #include "tickinfo.h"
 #include <stdio.h>
 
+TickInfo::TickInfo(){}
+
 TickInfo::TickInfo( int tickNumber, int roundNumber, RoundStatus roundStatus )
 {
 	this->tickNumber = tickNumber;
@@ -86,4 +88,31 @@ void TickInfo::Print()
 			( *it ).Print();
 		}
 	}
+}
+
+size_t TickInfo::SizeTest()
+{
+	size_t sum = 0;
+
+	for ( std::vector< Player >::iterator it = playersInTick.begin(); it != playersInTick.end(); ++it )
+	{			
+		sum += sizeof(*it);
+	}
+
+	for ( std::vector< GrenadeEntity >::iterator it = grenadesInTick.begin(); it != grenadesInTick.end(); ++it )
+	{			
+		sum += sizeof(*it);
+	}
+
+	for ( std::vector< PlayerHurtEvent >::iterator it = hurtEventsInTick.begin(); it != hurtEventsInTick.end(); ++it )
+	{			
+		sum += sizeof(*it);
+	}
+
+	for ( std::vector< PlayerDeathEvent >::iterator it = deathEventsInTick.begin(); it != deathEventsInTick.end(); ++it )
+	{			
+		sum += sizeof(*it);
+	}
+
+	return sum;
 }
