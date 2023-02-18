@@ -8,7 +8,7 @@ Demos and network messages in CS:GO use Google's Protocol Buffers (protobuf). Pr
 Building demoinfogo
 -------------------
 
-### Windows
+### Windows
 
 In order to build demoinfogo on Windows, follow these steps:
 
@@ -18,6 +18,33 @@ In order to build demoinfogo on Windows, follow these steps:
 4. Build the *Release* configuration of `libprotobuf`. Building any other projects is not required.
 5. Open `demoinfogo/demoinfogo.vcxproj` in Microsoft Visual Studio 2010. Building the Release configuration creates the binary `demoinfogo/demoinfogo.exe`
 
+
+### CMake on Windows
+
+Build and install the following libraries using CMake.
+
+* protobuf v21.12: https://github.com/protocolbuffers/protobuf/releases/tag/v21.12
+* zlib v1.2.13 (needed for protobuf): https://github.com/protocolbuffers/protobuf/releases/tag/v21.12
+
+These libraries must be installed into `csgo-demoinfo/vendor/out`.
+
+```
+csgo-demoinfogo/
+  ...
+  vendor/
+    out/
+      protobuf/
+      zlib/
+```
+
+To build `demoinfogo` with CMake, follow these steps:
+
+```
+cmake --preset release
+cmake --build out/build/release --target install
+
+.\out\install\release\bin\demoinfogo.exe
+```
 
 Working with Network Messages
 -----------------------------
