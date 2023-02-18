@@ -35,7 +35,7 @@
 // There is an important difference between the signed int types (sint32 and sint64)
 // and the "standard" int types (int32 and int64) when it comes to encoding negative
 // numbers.  If you use int32 or int64 as the type for a negative number, the
-// resulting varint is always ten bytes long – it is, effectively, treated like a
+// resulting varint is always ten bytes long - it is, effectively, treated like a
 // very large unsigned integer.  If you use one of the signed types, the resulting
 // varint uses ZigZag encoding, which is much more efficient.
 
