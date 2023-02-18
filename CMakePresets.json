@@ -15,7 +15,7 @@
                 "CMAKE_CXX_COMPILER": "cl",
                 "CMAKE_INSTALL_PREFIX": "${sourceDir}/out/install/${presetName}",
                 "CMAKE_PREFIX_PATH": "${sourceDir}/vendor/out/protobuf/${presetName};",
-                "CMAKE_MSVC_RUNTIME_LIBRARY": "MultiThreaded"
+                "CMAKE_EXPORT_COMPILE_COMMANDS": true
             }
         },
         {
@@ -24,7 +24,8 @@
                 "base"
             ],
             "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Debug"
+                "CMAKE_BUILD_TYPE": "Debug",
+                "CMAKE_MSVC_RUNTIME_LIBRARY": "MultiThreadedDebug"
             }
         },
         {
@@ -33,7 +34,8 @@
                 "base"
             ],
             "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Release"
+                "CMAKE_BUILD_TYPE": "Release",
+                "CMAKE_MSVC_RUNTIME_LIBRARY": "MultiThreaded"
             }
         }
     ]
