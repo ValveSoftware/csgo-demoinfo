@@ -19,7 +19,7 @@
             }
         },
         {
-            "name": "debug",
+            "name": "Debug",
             "inherits": [
                 "base"
             ],
@@ -28,7 +28,7 @@
             }
         },
         {
-            "name": "release",
+            "name": "Release",
             "inherits": [
                 "base"
             ],

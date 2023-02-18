@@ -33,17 +33,21 @@ csgo-demoinfogo/
   vendor/
     out/
       protobuf/
-        release/
-        debug/
+        Release/
+        Debug/
 ```
 
-To build `demoinfogo` with CMake (in `release` mode), open a Visual Studio developer console and follow these steps:
+To build `demoinfogo` with CMake (in `Release` mode), open a Visual Studio developer console and follow these steps:
 
 ```
-cmake --preset release
-cmake --build out/build/release --target install
+cmake --preset Release
+cmake --build out/build/Release --target install
+```
 
-.\out\install\release\bin\demoinfogo.exe
+The program can be invoked with:
+
+```
+.\out\install\Release\bin\demoinfogo.exe
 ```
 
 Working with Network Messages
