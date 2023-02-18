@@ -39,6 +39,7 @@
 // very large unsigned integer.  If you use one of the signed types, the resulting
 // varint uses ZigZag encoding, which is much more efficient.
 
+syntax = "proto2";
 
 // Commenting this out allows it to be compiled for SPEED or LITE_RUNTIME.
 // option optimize_for = SPEED;
