@@ -38,3 +38,9 @@ add_executable(demoinfogo
 target_include_directories(demoinfogo PUBLIC ${CMAKE_CURRENT_LIST_DIR} ${CMAKE_CURRENT_BINARY_DIR})
 
 target_link_libraries(demoinfogo demoinfogo-proto)
+
+# Install the executable.
+#
+install(TARGETS demoinfogo
+    RUNTIME DESTINATION "bin"
+)
