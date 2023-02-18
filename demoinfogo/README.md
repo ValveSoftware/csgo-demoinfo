@@ -23,10 +23,9 @@ In order to build demoinfogo on Windows, follow these steps:
 
 Build and install the following libraries using CMake.
 
-* protobuf v21.12: https://github.com/protocolbuffers/protobuf/releases/tag/v21.12
-* zlib v1.2.13 (needed for protobuf): https://github.com/protocolbuffers/protobuf/releases/tag/v21.12
-
-These libraries must be installed into `csgo-demoinfo/vendor/out`.
+* protobuf v21.12: https://github.com/protocolbuffers/protobuf/releases/tag/v21.12. **Note:** You can build with `-Dprotobuf_WITH_ZLIB=OFF` as ZLIB support is not needed.*
+  
+These libraries must be installed into `csgo-demoinfo/vendor/out/{library name}/{preset name}`. For example:
 
 ```
 csgo-demoinfogo/
@@ -34,10 +33,11 @@ csgo-demoinfogo/
   vendor/
     out/
       protobuf/
-      zlib/
+        release/
+        debug/
 ```
 
-To build `demoinfogo` with CMake, follow these steps:
+To build `demoinfogo` with CMake (in `release` mode), open a Visual Studio developer console and follow these steps:
 
 ```
 cmake --preset release
