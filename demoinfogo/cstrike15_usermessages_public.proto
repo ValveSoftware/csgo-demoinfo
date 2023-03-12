@@ -27,6 +27,8 @@
 //
 //=============================================================================
 
+syntax = "proto2";
+
 // We care more about speed than code size
 option optimize_for = SPEED;
 
